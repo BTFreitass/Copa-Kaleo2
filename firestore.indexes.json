@@ -1,0 +1,36 @@
+{
+  "indexes": [
+    { "collectionGroup": "posts", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "publishedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "posts", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "category", "order": "ASCENDING" }, { "fieldPath": "publishedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "posts", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "teamIds", "arrayConfig": "CONTAINS" }, { "fieldPath": "publishedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "posts", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "updatedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "matches", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "order", "order": "ASCENDING" } ] },
+    { "collectionGroup": "leaderboard", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "totalPoints", "order": "DESCENDING" }, { "fieldPath": "exactScores", "order": "DESCENDING" } ] },
+    { "collectionGroup": "leaderboard", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "leagueIds", "arrayConfig": "CONTAINS" }, { "fieldPath": "totalPoints", "order": "DESCENDING" } ] },
+    { "collectionGroup": "predictions", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "uid", "order": "ASCENDING" } ] },
+    { "collectionGroup": "playerStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "goals", "order": "DESCENDING" } ] },
+    { "collectionGroup": "wallMessages", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "videos", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "publishedAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "albums", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "registrations", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "editions", "queryScope": "COLLECTION_GROUP", "fields": [
+      { "fieldPath": "tournamentId", "order": "ASCENDING" }, { "fieldPath": "kaleoPoints", "order": "DESCENDING" } ] }
+  ],
+  "fieldOverrides": [
+    { "collectionGroup": "editions", "fieldPath": "tournamentId", "indexes": [
+      { "order": "ASCENDING", "queryScope": "COLLECTION" }, { "order": "ASCENDING", "queryScope": "COLLECTION_GROUP" } ] }
+  ]
+}

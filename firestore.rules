@@ -1,0 +1,259 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
+    function isMesario() { return signedIn() && (request.auth.token.mesario == true || isAdmin()); }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function now() { return request.time.toMillis(); }
+    function onlyKeys(keys) { return request.resource.data.keys().hasOnly(keys); }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+    function matchDoc(id) { return get(/databases/$(database)/documents/matches/$(id)).data; }
+    function tournamentDoc(id) { return get(/databases/$(database)/documents/tournaments/$(id)).data; }
+    function validGoals(n) { return n is int && n >= 0 && n <= 30; }
+
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /tournaments/{tid} {
+      allow read: if true;
+      allow write: if isAdmin();
+
+      match /mvpVotes/{uid} {
+        allow read: if signedIn();
+        allow create: if isOwner(uid)
+          && tournamentDoc(tid).phase in ['matchday', 'post']
+          && onlyKeys(['playerId', 'createdAt'])
+          && request.resource.data.playerId is string;
+      }
+    }
+
+    match /teams/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /players/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /matches/{mid} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (isMesario()
+        && changed().hasOnly(['status', 'period', 'clockStartedAt', 'score', 'penalties', 'finishedAt', 'kickoffAt']));
+
+      match /events/{eid} {
+        allow read: if true;
+        allow create, update: if isMesario();
+        allow delete: if isAdmin();
+      }
+
+      match /mvpVotes/{uid} {
+        allow read: if signedIn();
+        allow create: if isOwner(uid)
+          && matchDoc(mid).status == 'finished'
+          && now() < matchDoc(mid).finishedAt + 600000
+          && onlyKeys(['playerId', 'createdAt'])
+          && request.resource.data.playerId is string;
+      }
+
+      match /private/{doc} {
+        allow read: if isMesario();
+        allow write: if false;
+      }
+    }
+
+    match /predictions/{pid} {
+      function validPrediction() {
+        let d = request.resource.data;
+        let m = matchDoc(d.matchId);
+        return pid == d.matchId + '_' + request.auth.uid
+          && d.uid == request.auth.uid
+          && d.tournamentId == m.tournamentId
+          && d.stage == m.stage
+          && m.homeTeamId != null && m.awayTeamId != null
+          && m.status == 'scheduled'
+          && now() < m.kickoffAt
+          && validGoals(d.home) && validGoals(d.away)
+          && d.isJoker is bool
+          && d.displayName is string && d.displayName.size() <= 60
+          && onlyKeys(['tournamentId', 'matchId', 'uid', 'displayName', 'stage', 'home', 'away', 'isJoker', 'createdAt', 'updatedAt', 'points']);
+      }
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if signedIn() && validPrediction() && request.resource.data.points == null;
+      allow update: if signedIn() && resource.data.uid == request.auth.uid && validPrediction()
+        && request.resource.data.points == resource.data.points;
+    }
+
+    match /longTermPredictions/{pid} {
+      function validLongTerm() {
+        let d = request.resource.data;
+        let t = tournamentDoc(d.tournamentId);
+        return pid == d.tournamentId + '_' + request.auth.uid
+          && d.uid == request.auth.uid
+          && (t.firstKickoffAt == null || now() < t.firstKickoffAt)
+          && onlyKeys(['tournamentId', 'uid', 'championTeamId', 'topScorerPlayerId', 'revelationTeamId', 'points']);
+      }
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow create: if signedIn() && validLongTerm() && request.resource.data.points == null;
+      allow update: if signedIn() && resource.data.uid == request.auth.uid && validLongTerm()
+        && request.resource.data.points == resource.data.points;
+    }
+
+    match /leaderboard/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /leagues/{lid} {
+      allow read: if signedIn();
+      allow write: if false;
+      match /members/{uid} {
+        allow read: if signedIn();
+        allow write: if false;
+      }
+    }
+
+    match /duels/{did} {
+      allow read: if signedIn() && (resource.data.challengerUid == request.auth.uid || resource.data.opponentUid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.challengerUid == request.auth.uid
+        && request.resource.data.opponentUid != request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.scope in ['day', 'group', 'knockout']
+        && onlyKeys(['tournamentId', 'scope', 'challengerUid', 'challengerName', 'opponentUid', 'opponentName', 'status', 'createdAt']);
+      allow update: if signedIn() && resource.data.opponentUid == request.auth.uid
+        && resource.data.status == 'pending'
+        && request.resource.data.status in ['accepted', 'declined']
+        && changed().hasOnly(['status']);
+    }
+
+    match /checkins/{id} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /wallMessages/{id} {
+      allow read: if resource.data.status == 'approved' || isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 140
+        && onlyKeys(['tournamentId', 'uid', 'displayName', 'text', 'status', 'createdAt']);
+      allow update, delete: if isAdmin();
+    }
+
+    match /posts/{id} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /albums/{aid} {
+      allow read: if true;
+      allow write: if isAdmin();
+      match /photos/{pid} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    match /videos/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /playerStats/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /hallOfFame/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /stickers/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /trades/{tid} {
+      allow read: if signedIn() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.toUid != request.auth.uid
+        && request.resource.data.status == 'open'
+        && request.resource.data.offer is list && request.resource.data.offer.size() > 0 && request.resource.data.offer.size() <= 10
+        && request.resource.data.request is list && request.resource.data.request.size() > 0 && request.resource.data.request.size() <= 10
+        && onlyKeys(['tournamentId', 'fromUid', 'fromName', 'toUid', 'toName', 'offer', 'request', 'status', 'createdAt']);
+      allow update: if signedIn() && resource.data.status == 'open' && changed().hasOnly(['status'])
+        && ((resource.data.fromUid == request.auth.uid && request.resource.data.status == 'cancelled')
+          || (resource.data.toUid == request.auth.uid && request.resource.data.status == 'declined'));
+    }
+
+    match /coupons/{cid} {
+      allow read: if true;
+      allow write: if isAdmin();
+      match /private/{doc} {
+        allow read, write: if isAdmin();
+      }
+    }
+
+    match /registrations/{rid} {
+      allow read: if isAdmin() || (signedIn() && resource.data.submittedBy == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.submittedBy == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.type in ['team', 'athlete'];
+      allow update, delete: if isAdmin();
+    }
+
+    match /activity/{id} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    match /users/{uid} {
+      allow read: if true;
+      allow create: if isOwner(uid)
+        && onlyKeys(['displayName', 'photoURL', 'isGuest', 'favoriteTeamId', 'createdAt'])
+        && request.resource.data.displayName is string && request.resource.data.displayName.size() <= 60;
+      allow update: if (isOwner(uid)
+          && changed().hasOnly(['displayName', 'photoURL', 'isGuest', 'favoriteTeamId'])
+          && request.resource.data.displayName.size() <= 60)
+        || isAdmin();
+
+      match /editions/{tid} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow write: if false;
+      }
+      match /achievements/{aid} {
+        allow read: if true;
+        allow write: if false;
+      }
+      match /medals/{tid} {
+        allow read: if true;
+        allow update: if isOwner(uid) && changed().hasOnly(['revealedAt']) && resource.data.revealedAt == null;
+        allow create, delete: if false;
+      }
+      match /collection/{sid} {
+        allow read: if signedIn();
+        allow write: if false;
+      }
+      match /packs/{pid} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+      match /coupons/{cid} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
+    }
+  }
+}

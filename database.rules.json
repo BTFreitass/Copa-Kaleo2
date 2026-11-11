@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "reactions": {
+      "$matchId": {
+        ".read": true,
+        "counters": {
+          "$teamId": {
+            "$emoji": {
+              ".write": "auth != null",
+              ".validate": "newData.isNumber() && newData.val() >= (data.exists() ? data.val() : 0) && newData.val() <= (data.exists() ? data.val() : 0) + 1"
+            }
+          }
+        },
+        "stream": {
+          "$pushId": {
+            ".write": "auth != null && !data.exists()",
+            ".validate": "newData.hasChildren(['e', 't', 'u', 'ts']) && newData.child('u').val() === auth.uid && newData.child('e').isString() && newData.child('e').val().length <= 4 && newData.child('ts').val() <= now"
+          }
+        }
+      }
+    },
+    "transmissao": { ".read": true, ".write": "auth != null && auth.token.admin === true" },
+    "$other": { ".read": false, ".write": false }
+  }
+}

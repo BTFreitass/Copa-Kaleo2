@@ -67,3 +67,11 @@ node_modules/
 
 # dataconnect generated files
 .dataconnect
+
+# Copa Kaleo 2.0
+node_modules/
+apps/web/dist/
+functions/lib/
+functions/.secret.local
+.emulator-data/
+*.tsbuildinfo

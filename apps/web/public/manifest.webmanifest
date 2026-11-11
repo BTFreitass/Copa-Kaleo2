@@ -1,0 +1,9 @@
+{
+  "name": "Copa Kaleo",
+  "short_name": "Copa Kaleo",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#030712",
+  "icons": [{ "src": "/img/Kaleo.jpg", "sizes": "512x512", "type": "image/jpeg" }]
+}
