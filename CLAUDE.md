@@ -7,6 +7,18 @@ Portal do torneio Copa Kaleo, migrando de landing page estática (`public/index.
 2. Leia [docs/STATUS.md](docs/STATUS.md): onde paramos, próximos passos, problemas conhecidos e quem está mexendo em quê. Não pegue uma tarefa que o outro colaborador marcou.
 3. Nunca commite direto na `main` (produção) nem na `hmg` (homologação). Para uma tarefa nova, crie `feat/<ID>-assunto` ou `fix/<assunto>` a partir da `hmg` atualizada.
 
+## Antes de alterar QUALQUER coisa (obrigatório, toda vez)
+Não basta conferir no início da sessão: o outro colaborador pode ter publicado algo há poucos minutos. **Antes de cada alteração** (editar arquivo, commit, push, merge, deploy ou mudança no Firebase/console), rode:
+```bash
+git fetch --all --prune
+git status -sb
+git log --oneline HEAD..origin/hmg
+git log --oneline HEAD..origin/<sua-branch>
+```
+- Se aparecer algum commit novo: **pare**, avise o usuário do que chegou (autor e mensagem), traga as mudanças (`git pull` ou `git merge origin/hmg`) e releia o [docs/STATUS.md](docs/STATUS.md) antes de continuar.
+- Se o STATUS.md mostrar que o outro colaborador está mexendo nos mesmos arquivos ou na mesma área, não altere: avise o usuário e combine antes.
+- Se a sua branch e a remota divergirem, nunca use `push --force`. Faça merge e resolva os conflitos.
+
 ## Registro contínuo (obrigatório, vale para os dois colaboradores)
 O outro colaborador e o Claude dele dependem do [docs/STATUS.md](docs/STATUS.md) para saber o que está acontecendo. Registre **na hora**, não só no fim da sessão:
 

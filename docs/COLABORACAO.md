@@ -1,11 +1,12 @@
 # Como trabalhar em dupla sem pisar no código do outro
 
-## As 4 regras
+## As 5 regras
 
 1. **Sempre comece puxando o código mais novo** (`git pull`). Sempre.
 2. **Nunca commite direto na `main` nem na `hmg`.** Cada tarefa ganha a sua branch.
 3. **Antes de começar, avise em `docs/STATUS.md`** o que você vai fazer.
 4. **Registre tudo em `docs/STATUS.md` na hora:** PRs abertos, qualquer mudança no Firebase de verdade ou no site oficial (com como desfazer) e o diário da sessão. O Claude de cada um já faz isso sozinho; se você mexer em algo pelo console, conte para ele registrar. Nunca escreva senhas ou chaves lá.
+5. **Antes de alterar qualquer coisa, confira de novo se chegou novidade** (`git fetch` e `git log HEAD..origin/hmg`). Vale para cada edição, commit, merge ou deploy, não só para o começo do dia. Se chegou algo, traga para a sua branch antes de mexer.
 
 ## Como as branches funcionam
 
@@ -26,7 +27,7 @@ fix/ranking     ──┘    (teste)     (site no ar)
 ## Primeira vez (só uma vez por computador)
 
 ```bash
-git clone https://github.com/NewTplayeer/Copa-Kaleo2.git
+git clone https://github.com/BTFreitass/Copa-Kaleo2.git
 cd Copa-Kaleo2
 git checkout hmg
 npm install
@@ -116,6 +117,7 @@ Pode pedir ao Claude: *"resolve o conflito em tal arquivo mantendo as duas mudan
 O Claude de vocês lê o `CLAUDE.md` automaticamente. Ele já está instruído a:
 
 - puxar o código mais novo e ler `docs/STATUS.md` antes de começar;
+- conferir de novo se chegou commit novo **antes de cada alteração**, e parar para avisar se chegou;
 - trabalhar numa branch `feat/` ou `fix/`, nunca direto na `main` ou na `hmg`;
 - atualizar `docs/STATUS.md` ao terminar.
 
@@ -129,6 +131,7 @@ Uma boa primeira mensagem para ele: **"Lê o STATUS.md e me diz onde paramos."**
 |---|---|
 | Ver em que branch estou | `git status` |
 | Pegar o código mais novo | `git checkout hmg && git pull` |
+| Ver se chegou algo antes de mexer | `git fetch && git log --oneline HEAD..origin/hmg` |
 | Começar uma tarefa | `git checkout -b feat/F05-ligas` |
 | Salvar meu trabalho | `git add . && git commit -m "feat(F05): ..." && git push` |
 | Trazer novidades para minha branch | `git fetch && git merge origin/hmg` |
