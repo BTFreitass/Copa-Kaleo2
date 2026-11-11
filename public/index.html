@@ -125,7 +125,7 @@
         .sponsor-track {
             display: flex;
             flex-direction: column;
-            animation: scrollVertical 30s linear infinite;
+            animation: scrollVertical 140s linear infinite;
         }
 
         .sponsor-track:hover { animation-play-state: paused; }
@@ -141,7 +141,16 @@
 
     <header class="bg-gray-900 border-b border-gray-800 py-6 px-4 shadow-[0_4px_30px_rgba(0,0,0,0.5)] z-10 relative">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="w-10 md:w-12"></div>
+            <a href="https://copafacil.com/4copakaleo" target="_blank" rel="noopener noreferrer"
+               class="flex flex-col items-center gap-1 group">
+                <span class="bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg shadow-green-500/30 transition-all duration-300 group-hover:scale-105 flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Copa Fácil
+                </span>
+                <span class="text-green-400 text-[10px] leading-tight text-center hidden md:block">Acompanhe os resultados<br>em tempo real</span>
+            </a>
 
             <div class="flex items-center gap-4 hover:scale-105 transition-transform duration-300">
                 <div class="bg-gradient-to-br from-blue-600 to-purple-600 p-1 rounded-xl shadow-lg shadow-blue-500/20">
@@ -186,7 +195,7 @@
             </div>
         </section>
 
-        <aside class="w-full lg:w-80 bg-gray-900 rounded-2xl border border-gray-800 flex flex-col overflow-hidden h-[450px] lg:h-auto">
+        <aside class="w-full lg:w-[420px] bg-gray-900 rounded-2xl border border-gray-800 flex flex-col overflow-hidden h-[450px] lg:h-auto">
             <div class="p-5 border-b border-gray-800 flex items-center justify-center gap-2">
                 <span class="text-yellow-500">★</span>
                 <h2 class="text-sm font-bold text-gray-300 uppercase tracking-widest">Patrocinadores</h2>
@@ -273,20 +282,23 @@
 
         // PATROCINADORES - Rolagem Infinita Perfeita
         const sponsors = [
-            { name: "Marca 1", logo: "https://placehold.co/300x120/1f2937/4ade80?text=PATROCINADOR+1" },
-            { name: "Marca 2", logo: "https://placehold.co/300x120/1f2937/60a5fa?text=PATROCINADOR+2" },
-            { name: "Marca 3", logo: "https://placehold.co/300x120/1f2937/60a5fa?text=PATROCINADOR+3" },
-            { name: "Marca 4", logo: "https://placehold.co/300x120/1f2937/60a5fa?text=PATROCINADOR+4" },
-            { name: "Marca 5", logo: "https://placehold.co/300x120/1f2937/60a5fa?text=PATROCINADOR+5" },
-            { name: "Marca 6", logo: "https://placehold.co/300x120/1f2937/f472b6?text=PATROCINADOR+6" }
+            { name: "Patrocinador 43", logo: "img/43.png" },
+            { name: "Patrocinador 44", logo: "img/44.png" },
+            { name: "Patrocinador 45", logo: "img/45.png" },
+            { name: "Patrocinador 46", logo: "img/46.png" },
+            { name: "Patrocinador 47", logo: "img/47.png" },
+            { name: "Patrocinador 48", logo: "img/48.png" },
+            { name: "Patrocinador 49", logo: "img/49.png" },
+            { name: "Patrocinador 50", logo: "img/50.png" },
+            { name: "Patrocinador 51", logo: "img/51.png" }
         ];
 
         const track = document.getElementById('sponsor-track');
         
         // 1. Criamos o HTML base de um patrocinador
         const itemHTML = sponsors.map(s => `
-            <div class="flex justify-center items-center px-6 transition-transform hover:scale-110">
-                <img src="${s.logo}" alt="${s.name}" class="w-full max-w-[200px] h-auto rounded-xl border border-gray-700 bg-gray-800 p-2">
+            <div class="flex justify-center items-center px-6 py-1">
+                <img src="${s.logo}" alt="${s.name}" class="w-full h-auto rounded-xl border border-gray-700 bg-gray-800 p-2 transition-transform hover:scale-110">
             </div>
         `).join('');
         
