@@ -1,10 +1,11 @@
 # Como trabalhar em dupla sem pisar no código do outro
 
-## As 3 regras
+## As 4 regras
 
 1. **Sempre comece puxando o código mais novo** (`git pull`). Sempre.
 2. **Nunca commite direto na `main` nem na `hmg`.** Cada tarefa ganha a sua branch.
 3. **Antes de começar, avise em `docs/STATUS.md`** o que você vai fazer.
+4. **Registre tudo em `docs/STATUS.md` na hora:** PRs abertos, qualquer mudança no Firebase de verdade ou no site oficial (com como desfazer) e o diário da sessão. O Claude de cada um já faz isso sozinho; se você mexer em algo pelo console, conte para ele registrar. Nunca escreva senhas ou chaves lá.
 
 ## Como as branches funcionam
 
