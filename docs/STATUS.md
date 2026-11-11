@@ -20,22 +20,19 @@
 | Testado no navegador | **Ainda não.** Ninguém clicou pelas telas com os emuladores rodando |
 | Produção | Site no ar continua sendo o antigo (`public/index.html`). Homologação publicada em https://copakaleo--hmg-rkmyzien.web.app |
 | Firestore (produção) | Existe, em `southamerica-east1`. **Regras e índices publicados** em 2026-11-11. Ainda sem dados |
-| Realtime Database | ⚠️ Regras **totalmente abertas** (`.read`/`.write: true`). Não alterado: o painel do site antigo troca o vídeo sem login e quebraria |
+| Realtime Database | **Regras publicadas** em 2026-11-11. Tudo fechado, exceto `transmissao/videoAtual`, que segue com escrita aberta (só texto até 40 caracteres) porque o painel do site antigo troca o vídeo sem login. Fechar de vez quando o site novo entrar no ar |
 | Storage | Ativado em `us-east1` (cota gratuita de 5 GB; região não pode mudar). **Regras publicadas** em 2026-11-11 |
-| Functions | Não publicadas. Secret Manager responde, o que indica faturamento ativo: confirmar no console se o plano é Blaze |
-| Chaves | `ANTHROPIC_API_KEY` e VAPID **ainda não configuradas** (ver passos abaixo) |
+| Functions | **Não publicadas.** Projeto já tem faturamento ativo (segredos funcionam). Falta rodar `firebase.cmd deploy --only functions` |
+| Chaves | `ANTHROPIC_API_KEY` configurada no Secret Manager. VAPID configurada em `apps/web/.env.production` |
 
 ## Próximos passos (em ordem)
 
-1. **Teste manual no navegador** com `npm run emulators` + `npm run seed` + `npm run dev`. Passar por cada tela com as contas de demonstração e anotar os problemas aqui, na seção "Problemas conhecidos".
-2. **Decidir o que fazer com o Realtime Database aberto.** Opções: (a) fechar tudo e manter só `transmissao` aberta até o site novo entrar no ar; (b) fechar tudo agora e aceitar que o painel antigo pare de trocar o vídeo. Depois, `firebase deploy --only database`.
-3. **Confirmar o plano Blaze** no console. Depois de configurar a chave da Anthropic (passo 4), `firebase deploy --only functions`.
-4. **Configurar as chaves** (cada pessoa com acesso ao projeto faz isso na própria máquina; nunca colar a chave no chat nem commitar):
-   - Claude: `firebase functions:secrets:set ANTHROPIC_API_KEY` (o terminal pede a chave, criada em console.anthropic.com).
-   - VAPID: Console → Configurações do projeto → Cloud Messaging → Certificados push da Web → Gerar. Colocar em `apps/web/.env.production` como `VITE_FIREBASE_VAPID_KEY=...` (é uma chave pública, pode ir para o repositório).
-5. Ativar os métodos de login no console (Google, e-mail/senha, link, telefone, anônimo, Facebook).
-6. Trocar a senha `CopaKaleo2026`, que está exposta no `public/index.html` do site antigo.
-7. Reduzir o pacote do Firebase no site (hoje ~256 KB comprimido).
+1. **Publicar as Functions:** `firebase.cmd deploy --only functions` (no PowerShell, use `firebase.cmd` em vez de `firebase`).
+2. **Teste manual no navegador** com `npm run emulators` + `npm run seed` + `npm run dev`. Passar por cada tela com as contas de demonstração e anotar os problemas aqui, na seção "Problemas conhecidos".
+3. Ativar os métodos de login no console (Google, e-mail/senha com link, telefone, anônimo; Facebook depois).
+4. Trocar a senha `CopaKaleo2026`, que está exposta no `public/index.html` do site antigo.
+5. Quando o site novo substituir o antigo: remover a exceção de `transmissao/videoAtual` em `database.rules.json` e publicar com `firebase deploy --only database`.
+6. Reduzir o pacote do Firebase no site (hoje ~256 KB comprimido).
 
 ## Problemas conhecidos
 
@@ -60,9 +57,10 @@ Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou,
 
 ### 2026-11-11 (tarde) · Bruno
 - Regras e índices do Firestore publicados em produção (`firebase deploy --only firestore`).
-- Descoberto que o Realtime Database está aberto para qualquer um. Não mexido, aguardando decisão (passo 2).
+- Realtime Database estava aberto para qualquer um ler e apagar. Fechado, mantendo só `transmissao/videoAtual` gravável para o site antigo não quebrar (decisão do Bruno: opção "a").
 - Storage ativado no console (us-east1, para usar a cota gratuita) e regras publicadas.
-- Chaves ainda não configuradas: dependem da chave pessoal da Anthropic e da VAPID gerada no console.
+- `ANTHROPIC_API_KEY` criada no Secret Manager e chave VAPID adicionada ao `.env.production`.
+- Deploy das Functions ficou pendente: precisa de autorização explícita ou ser rodado manualmente.
 
 ### 2026-11-11 · Bruno
 - Monorepo criado: `packages/shared` (domínio), `apps/web` (React), `functions` (Cloud Functions), `scripts` (seed e simulação).
