@@ -228,7 +228,13 @@
     </div>
 
     <script>
-        const ADMIN_PASSWORD = "CopaKaleo2026";
+        const ADMIN_PASSWORD_SHA256 = "3cd678088392cbe78dbc04dbcf67ece1d6ad4c4540e90ddbf4acf7b74af4ccd3";
+
+        async function sha256(text) {
+            const bytes = new TextEncoder().encode(text);
+            const digest = await crypto.subtle.digest('SHA-256', bytes);
+            return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
 
         function openAdminModal() {
             const m = document.getElementById('admin-modal');
@@ -252,8 +258,8 @@
             }, 300);
         }
 
-        function verifyAdmin() {
-            if (document.getElementById('admin-password').value === ADMIN_PASSWORD) {
+        async function verifyAdmin() {
+            if (await sha256(document.getElementById('admin-password').value) === ADMIN_PASSWORD_SHA256) {
                 closeAdminModal();
                 const controls = document.getElementById('admin-controls');
                 controls.classList.remove('hidden');
