@@ -7,10 +7,29 @@ Portal do torneio Copa Kaleo, migrando de landing page estática (`public/index.
 2. Leia [docs/STATUS.md](docs/STATUS.md): onde paramos, próximos passos, problemas conhecidos e quem está mexendo em quê. Não pegue uma tarefa que o outro colaborador marcou.
 3. Nunca commite direto na `main` (produção) nem na `hmg` (homologação). Para uma tarefa nova, crie `feat/<ID>-assunto` ou `fix/<assunto>` a partir da `hmg` atualizada.
 
+## Registro contínuo (obrigatório, vale para os dois colaboradores)
+O outro colaborador e o Claude dele dependem do [docs/STATUS.md](docs/STATUS.md) para saber o que está acontecendo. Registre **na hora**, não só no fim da sessão:
+
+| Quando acontecer... | Registre em STATUS.md |
+|---|---|
+| Começar uma tarefa | Linha em "Quem está mexendo em quê" (commit e push logo, antes de codificar) |
+| Abrir, fazer merge ou fechar um PR | Tabela "Pull Requests abertos" |
+| Qualquer mudança no Firebase real (`copakaleo`) ou no site oficial: deploy, regras, segredos, configurações no console, dados | Linha no topo do "Registro de produção", **com como desfazer** |
+| Decisão de escopo, arquitetura ou de produto | "Decisões registradas" no [docs/BACKLOG.md](docs/BACKLOG.md) |
+| Bug ou limitação encontrada e não resolvida | "Problemas conhecidos" |
+| Mudança no que vem a seguir | "Próximos passos" e "Estado atual" |
+
+Regras do registro:
+- Identifique quem fez: use o nome de `git config user.name` (ou pergunte ao usuário na primeira sessão) e escreva "Nome (Claude)" quando foi o Claude que executou.
+- Faça commit das atualizações do STATUS.md junto com o trabalho, na mesma branch e no mesmo PR.
+- **Nunca** escreva senhas, chaves secretas, tokens ou dados pessoais no STATUS.md, no BACKLOG.md ou em commits. Registre só que a mudança aconteceu e com quem a informação ficou.
+- Se encontrar no STATUS.md algo desatualizado (PR já mesclado, tarefa terminada), corrija.
+
 ## Fim de toda sessão (obrigatório)
-- Atualize [docs/STATUS.md](docs/STATUS.md): entrada nova no topo do "Diário", tabela "Quem está mexendo em quê", próximos passos e problemas conhecidos.
+- Entrada nova no topo do "Diário" do [docs/STATUS.md](docs/STATUS.md): o que mudou, o que ficou pela metade, o que o próximo precisa saber. Atualize também "Última atualização".
 - Atualize o status da tarefa em [docs/BACKLOG.md](docs/BACKLOG.md).
 - Rode `npm run typecheck` e `npm test` antes de sugerir o Pull Request (sempre para a `hmg`).
+- Antes de encerrar, confira que nada ficou só na sua máquina: commit e push do que foi feito, inclusive do STATUS.md.
 
 O fluxo completo para humanos está em [docs/COLABORACAO.md](docs/COLABORACAO.md).
 

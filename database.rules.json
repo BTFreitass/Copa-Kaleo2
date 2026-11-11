@@ -19,7 +19,13 @@
         }
       }
     },
-    "transmissao": { ".read": true, ".write": "auth != null && auth.token.admin === true" },
+    "transmissao": {
+      ".read": true,
+      "videoAtual": {
+        ".write": true,
+        ".validate": "newData.isString() && newData.val().length <= 40"
+      }
+    },
     "$other": { ".read": false, ".write": false }
   }
 }
