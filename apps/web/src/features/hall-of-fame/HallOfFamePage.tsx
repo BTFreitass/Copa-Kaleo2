@@ -17,7 +17,7 @@ export function HallOfFamePage() {
           <Card key={e.id} className="overflow-hidden">
             <div className="flex flex-col gap-6 p-6 md:flex-row md:items-center">
               <div className="flex items-center gap-4">
-                <div className="flex size-20 flex-col items-center justify-center rounded-2xl bg-gradient-brand text-white">
+                <div className="flex size-20 flex-col items-center justify-center rounded-2xl bg-gradient-brand text-snow">
                   <span className="text-xs font-bold uppercase">{e.edition}ª ed.</span>
                   <span className="text-2xl font-black">{e.season}</span>
                 </div>

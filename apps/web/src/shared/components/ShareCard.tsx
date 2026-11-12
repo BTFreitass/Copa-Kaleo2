@@ -42,10 +42,10 @@ export function ShareableCard({ fileName, children, label = 'Baixar para os stor
   );
 }
 
-export function StoryFrame({ children, accent = '#7c3aed' }: { children: ReactNode; accent?: string }) {
+export function StoryFrame({ children, accent = '#1d4ed8' }: { children: ReactNode; accent?: string }) {
   return (
     <div
-      className="relative flex size-full flex-col items-center justify-between overflow-hidden p-6 text-center text-white"
+      className="dark relative flex size-full flex-col items-center justify-between overflow-hidden p-6 text-center text-white"
       style={{ background: `radial-gradient(circle at 50% 0%, ${accent} 0%, #0b1120 55%, #030712 100%)` }}
     >
       <div className="flex items-center gap-2">

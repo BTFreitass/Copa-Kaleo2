@@ -54,7 +54,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| Bruno (Claude) | Novo esquema de cores (azul, vermelho e branco da logo) e modo claro/escuro | `docs/status-pos-merge` (PR #3) | 2026-11-12 |
+| — | — | — | — |
 
 ## Pull Requests abertos
 

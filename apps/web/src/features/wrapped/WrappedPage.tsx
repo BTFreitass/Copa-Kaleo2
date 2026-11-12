@@ -43,7 +43,7 @@ export function WrappedPage() {
       <p className="text-xl font-bold">check-ins na arquibancada</p>
       <p className="text-white/70">e {c.mvp_vote ?? 0} votos no Craque do Jogo</p>
     </StoryFrame>,
-    <StoryFrame key="bolao" accent="#7c3aed">
+    <StoryFrame key="bolao" accent="#1d4ed8">
       <p className="text-sm uppercase tracking-widest text-white/60">No bolão</p>
       <p className="text-8xl font-black">{board.data?.totalPoints ?? 0}</p>
       <p className="text-xl font-bold">pontos · {board.data?.rank ? `${board.data.rank}º lugar` : 'sem posição'}</p>

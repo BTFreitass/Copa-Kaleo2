@@ -137,7 +137,7 @@ export function PostEditor() {
           {teams.map((t) => {
             const on = post.teamIds.includes(t.id);
             return (
-              <button key={t.id} onClick={() => setPost({ ...post, teamIds: on ? post.teamIds.filter((x) => x !== t.id) : [...post.teamIds, t.id] })} className={`rounded-full px-3 py-1 text-xs font-bold ${on ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-400'}`}>
+              <button key={t.id} onClick={() => setPost({ ...post, teamIds: on ? post.teamIds.filter((x) => x !== t.id) : [...post.teamIds, t.id] })} className={`rounded-full px-3 py-1 text-xs font-bold ${on ? 'bg-purple-600 text-snow' : 'bg-gray-800 text-gray-400'}`}>
                 {t.shortName}
               </button>
             );

@@ -26,6 +26,7 @@ import { cn } from '@/shared/utils/format';
 import { SponsorsStrip } from '@/features/sponsors/Sponsors';
 import { useFavoriteTheme } from '@/features/gamification/useFavoriteTheme';
 import { UserMenu } from './UserMenu';
+import { ThemeToggle } from './ThemeToggle';
 
 const NAV = [
   { to: '/', label: 'Início', icon: Home, end: true },
@@ -85,6 +86,7 @@ export function PublicLayout() {
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle />
             {(isAdmin || isMesario) && (
               <Link to={isAdmin ? '/admin' : '/admin/jogos'} className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-purple-300 hover:bg-gray-800 sm:flex">
                 <Shield className="size-4" />
@@ -94,7 +96,7 @@ export function PublicLayout() {
             {user ? (
               <UserMenu />
             ) : (
-              <button onClick={openLogin} className="flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-bold text-white">
+              <button onClick={openLogin} className="flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-bold text-snow">
                 <LogIn className="size-4" />
                 Entrar
               </button>
@@ -105,7 +107,7 @@ export function PublicLayout() {
           </div>
         </div>
         {liveMatch && location.pathname !== '/ao-vivo' && (
-          <Link to="/ao-vivo" className="flex items-center justify-center gap-3 bg-red-600/90 px-4 py-1.5 text-sm font-bold text-white">
+          <Link to="/ao-vivo" className="flex items-center justify-center gap-3 bg-red-600/90 px-4 py-1.5 text-sm font-bold text-snow">
             <LiveDot />
             AO VIVO · {liveMatch.home?.shortName} {liveMatch.score.home} x {liveMatch.score.away} {liveMatch.away?.shortName}
           </Link>

@@ -19,11 +19,11 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 type Size = 'sm' | 'md' | 'lg' | 'xl';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-gradient-brand text-white shadow-lg shadow-purple-900/30 hover:brightness-110',
+  primary: 'bg-gradient-brand text-snow shadow-lg shadow-purple-900/30 hover:brightness-110',
   secondary: 'bg-gray-800 text-gray-100 hover:bg-gray-700 border border-gray-700',
   ghost: 'text-gray-300 hover:bg-gray-800 hover:text-white',
-  danger: 'bg-red-600 text-white hover:bg-red-500',
-  success: 'bg-emerald-600 text-white hover:bg-emerald-500',
+  danger: 'bg-red-600 text-snow hover:bg-red-500',
+  success: 'bg-emerald-600 text-snow hover:bg-emerald-500',
 };
 
 const sizes: Record<Size, string> = {
@@ -193,7 +193,7 @@ export function PageHeader({ title, subtitle, icon, actions }: { title: string; 
   return (
     <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex items-center gap-3">
-        {icon && <div className="rounded-2xl bg-gradient-brand p-2.5 text-white [&>svg]:size-6">{icon}</div>}
+        {icon && <div className="rounded-2xl bg-gradient-brand p-2.5 text-snow [&>svg]:size-6">{icon}</div>}
         <div>
           <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">{title}</h1>
           {subtitle && <p className="text-sm text-gray-400">{subtitle}</p>}
@@ -207,7 +207,7 @@ export function PageHeader({ title, subtitle, icon, actions }: { title: string; 
 export function Avatar({ name, src, size = 'md' }: { name: string; src?: string | null; size?: 'sm' | 'md' | 'lg' }) {
   const s = { sm: 'size-7 text-[10px]', md: 'size-9 text-xs', lg: 'size-16 text-lg' }[size];
   if (src) return <img src={src} alt={name} className={cn('rounded-full object-cover ring-2 ring-gray-800', s)} />;
-  return <span className={cn('inline-flex items-center justify-center rounded-full bg-gradient-brand font-bold text-white', s)}>{initials(name) || '?'}</span>;
+  return <span className={cn('inline-flex items-center justify-center rounded-full bg-gradient-brand font-bold text-snow', s)}>{initials(name) || '?'}</span>;
 }
 
 export function TeamCrest({ team, size = 'md' }: { team: Pick<TeamSnapshot, 'name' | 'shortName' | 'logoUrl' | 'primaryColor'> | null; size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' }) {
@@ -215,7 +215,7 @@ export function TeamCrest({ team, size = 'md' }: { team: Pick<TeamSnapshot, 'nam
   if (!team) return <span className={cn('inline-flex items-center justify-center rounded-full border border-dashed border-gray-700 text-gray-600', s)}>?</span>;
   if (team.logoUrl) return <img src={team.logoUrl} alt={team.name} className={cn('rounded-full bg-gray-800 object-cover', s)} />;
   return (
-    <span className={cn('inline-flex items-center justify-center rounded-full font-black text-white shadow-inner', s)} style={{ background: team.primaryColor }}>
+    <span className={cn('inline-flex items-center justify-center rounded-full font-black text-snow shadow-inner', s)} style={{ background: team.primaryColor }}>
       {team.shortName.slice(0, 3)}
     </span>
   );
@@ -245,8 +245,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             className={cn(
               'pointer-events-auto animate-pop rounded-xl px-4 py-3 text-sm font-semibold shadow-2xl',
-              t.tone === 'success' && 'bg-emerald-600 text-white',
-              t.tone === 'error' && 'bg-red-600 text-white',
+              t.tone === 'success' && 'bg-emerald-600 text-snow',
+              t.tone === 'error' && 'bg-red-600 text-snow',
               t.tone === 'info' && 'bg-gray-800 text-white ring-1 ring-gray-700',
             )}
           >

@@ -25,8 +25,8 @@ export function MedalView({ medal, size = 'md', hidden }: { medal: Pick<Medal, '
           ) : (
             <>
               <img src="/img/Kaleo.jpg" alt="" className="mb-1 w-1/3 rounded-lg opacity-90" />
-              <span className={cn('font-black uppercase leading-none text-white drop-shadow', size === 'sm' ? 'text-[8px]' : size === 'md' ? 'text-xs' : 'text-base')}>Copa Kaleo</span>
-              <span className={cn('font-black text-white/90', size === 'sm' ? 'text-[10px]' : 'text-sm')}>{medal.season}</span>
+              <span className={cn('font-black uppercase leading-none text-snow drop-shadow', size === 'sm' ? 'text-[8px]' : size === 'md' ? 'text-xs' : 'text-base')}>Copa Kaleo</span>
+              <span className={cn('font-black text-snow/90', size === 'sm' ? 'text-[10px]' : 'text-sm')}>{medal.season}</span>
             </>
           )}
           <div className="pointer-events-none absolute inset-0 shiny opacity-60" />

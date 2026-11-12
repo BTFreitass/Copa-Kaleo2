@@ -118,10 +118,10 @@ export function StickerTile({ sticker, quantity, isNew }: { sticker: Sticker; qu
     <div
       className={cn(
         'relative flex aspect-[3/4] flex-col items-center justify-between overflow-hidden rounded-xl border p-2 text-center',
-        has ? 'border-white/20' : 'border-dashed border-gray-700 bg-gray-900/50',
+        has ? 'dark border-white/20' : 'border-dashed border-gray-700 bg-gray-900/50',
         sticker.rarity === 'shiny' && has && 'ring-2 ring-yellow-300',
       )}
-      style={has ? { background: `linear-gradient(160deg, ${team?.primaryColor ?? '#7c3aed'}, #111827)` } : undefined}
+      style={has ? { background: `linear-gradient(160deg, ${team?.primaryColor ?? '#1d4ed8'}, #111827)` } : undefined}
     >
       {has && sticker.rarity === 'shiny' && <div className="pointer-events-none absolute inset-0 shiny" />}
       <span className={cn('self-start text-[10px] font-black', has ? 'text-white/70' : 'text-gray-600')}>{sticker.number}</span>

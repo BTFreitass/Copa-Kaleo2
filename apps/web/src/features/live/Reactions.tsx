@@ -66,7 +66,7 @@ export function Reactions({ match }: { match: Match }) {
           <TeamCrest team={match.home} size="xs" />
           <div className="flex h-3 flex-1 overflow-hidden rounded-full bg-gray-800">
             <div className="transition-all duration-700" style={{ width: `${homePct}%`, background: match.home?.primaryColor ?? '#3b82f6' }} />
-            <div className="flex-1 transition-all duration-700" style={{ background: match.away?.primaryColor ?? '#ec4899' }} />
+            <div className="flex-1 transition-all duration-700" style={{ background: match.away?.primaryColor ?? '#dc2626' }} />
           </div>
           <TeamCrest team={match.away} size="xs" />
         </div>

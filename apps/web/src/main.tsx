@@ -7,6 +7,9 @@ import { AuthProvider } from './features/auth/AuthProvider';
 import { TournamentProvider } from './features/tournament/TournamentProvider';
 import { LoginModal } from './features/auth/LoginModal';
 import { ToastProvider } from './shared/ui';
+import { initTheme } from './shared/lib/theme';
+
+initTheme();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
