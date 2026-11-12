@@ -54,7 +54,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| — | — | — | — |
+| Bruno (Claude) | F17/F25 · Tempo de jogo configurável (padrão futsal 2×20, intervalo 10/15) | `docs/status-pos-merge` (PR #3) | 2026-11-12 |
 
 ## Pull Requests abertos
 
