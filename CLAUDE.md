@@ -63,6 +63,7 @@ npm install
 npm run emulators          # terminal 1 — Auth, Firestore, RTDB, Storage, Functions (UI em :4000)
 npm run seed               # terminal 2 — 8 times, 16 jogos, 12 torcedores, admin e mesário
 npm run dev                # terminal 2 — site em http://localhost:5173
+npm run demo               # opcional, depois do seed — deixa o torneio "no meio do dia" (6 jogos encerrados, 1 ao vivo, mural, figurinhas)
 npm run simulate           # opcional — joga o torneio inteiro e confere ~30 comportamentos
 npm test                   # testes de domínio
 npm run typecheck

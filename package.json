@@ -15,7 +15,8 @@
     "test": "vitest run",
     "emulators": "npm run build -w functions && firebase emulators:start --project demo-copakaleo",
     "seed": "tsx scripts/seed.ts",
-    "simulate": "tsx scripts/simulate.ts"
+    "simulate": "tsx scripts/simulate.ts",
+    "demo": "tsx scripts/demo.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",

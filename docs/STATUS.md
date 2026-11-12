@@ -91,6 +91,7 @@ Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou,
 - Os deploys desses merges ficaram mais de 2 h na fila do GitHub Actions sem começar. O site no ar ainda não recebeu a senha nova. Primeiro item dos "Próximos passos".
 - Regra nova no `CLAUDE.md`: antes de **qualquer** alteração (não só no início da sessão), rodar `git fetch` e conferir se chegou commit novo. Se chegou, parar, avisar, trazer e reler este arquivo. Também no `docs/COLABORACAO.md` (regra 5).
 - URL de clone no tutorial corrigida para `BTFreitass/Copa-Kaleo2`.
+- Novo `npm run demo` (`scripts/demo.ts`): depois do `npm run seed`, deixa o torneio no meio do dia nos emuladores. São 6 jogos encerrados com gols, cartões, check-ins e craque, 1 jogo ao vivo, palpites, a liga "Galera da Igreja", o mural e pacotes abertos. Só mexe nos emuladores, nunca em produção.
 
 ### 2026-11-11 (noite) · Bruno
 - Senha do painel do site antigo trocada. A página agora guarda só o hash SHA-256; a senha nova ficou com o Bruno (não está em nenhum arquivo). PR #2 para a `main`.
