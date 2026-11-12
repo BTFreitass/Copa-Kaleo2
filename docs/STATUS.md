@@ -54,7 +54,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| — | — | — | — |
+| Bruno (Claude) | F17 · Cronômetro do mesário (iniciar, pausar, retomar, reiniciar, ajustar, 1º tempo/intervalo/2º tempo) | `docs/status-pos-merge` (PR #3) | 2026-11-12 |
 
 ## Pull Requests abertos
 
