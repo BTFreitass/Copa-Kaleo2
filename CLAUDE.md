@@ -60,8 +60,10 @@ O fluxo completo para humanos está em [docs/COLABORACAO.md](docs/COLABORACAO.md
 ## Rodando localmente
 ```bash
 npm install
-npm run emulators          # terminal 1 — Auth, Firestore, RTDB, Storage, Functions (UI em :4000)
-npm run seed               # terminal 2 — 8 times, 16 jogos, 12 torcedores, admin e mesário
+npm run emulators          # terminal 1 — Auth, Firestore, RTDB, Storage, Functions (UI em :4000). Carrega o banco local de .emulator-data se existir e salva ao fechar com Ctrl+C
+npm run seed               # terminal 2 — só na primeira vez (ou depois de emulators:reset): 8 times, 16 jogos, 12 torcedores, admin e mesário
+npm run emulators:save     # opcional — salva o banco local agora, com os emuladores rodando
+npm run emulators:reset    # apaga o banco local (com os emuladores desligados) para começar do zero
 npm run dev                # terminal 2 — site em http://localhost:5173
 npm run demo               # opcional, depois do seed — deixa o torneio "no meio do dia" (6 jogos encerrados, 1 ao vivo, mural, figurinhas)
 npm run simulate           # opcional — joga o torneio inteiro e confere ~30 comportamentos

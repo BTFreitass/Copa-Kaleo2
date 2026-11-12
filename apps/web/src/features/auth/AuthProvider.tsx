@@ -30,14 +30,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () =>
       onIdTokenChanged(auth, async (next) => {
         setUser(next);
-        if (next) {
+        if (!next) {
+          setClaims({ admin: false, mesario: false });
+          setLoading(false);
+          return;
+        }
+        try {
           const token = await next.getIdTokenResult();
           setClaims({ admin: token.claims.admin === true, mesario: token.claims.mesario === true || token.claims.admin === true });
-          await ensureProfile(next);
-        } else {
+        } catch (error) {
+          console.error(error);
           setClaims({ admin: false, mesario: false });
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
+        ensureProfile(next).catch((error) => console.error(error));
       }),
     [],
   );

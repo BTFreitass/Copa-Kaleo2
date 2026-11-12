@@ -3,6 +3,7 @@ import { connectAuthEmulator, getAuth } from 'firebase/auth';
 import {
   connectFirestoreEmulator,
   initializeFirestore,
+  memoryLocalCache,
   persistentLocalCache,
   persistentMultipleTabManager,
 } from 'firebase/firestore';
@@ -35,7 +36,7 @@ const emulatorConfig = {
 export const app = initializeApp(useEmulators ? emulatorConfig : productionConfig);
 export const auth = getAuth(app);
 export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+  localCache: useEmulators ? memoryLocalCache() : persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
   ignoreUndefinedProperties: true,
 });
 export const rtdb = getDatabase(app);

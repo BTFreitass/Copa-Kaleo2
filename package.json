@@ -13,7 +13,9 @@
     "build:web": "npm run build -w apps/web",
     "typecheck": "tsc -p packages/shared && tsc -p apps/web --noEmit && tsc -p functions --noEmit",
     "test": "vitest run",
-    "emulators": "npm run build -w functions && firebase emulators:start --project demo-copakaleo",
+    "emulators": "npm run build -w functions && node scripts/emulators.mjs",
+    "emulators:save": "firebase emulators:export ./.emulator-data --project demo-copakaleo --force",
+    "emulators:reset": "node -e \"require('fs').rmSync('.emulator-data',{recursive:true,force:true})\"",
     "seed": "tsx scripts/seed.ts",
     "simulate": "tsx scripts/simulate.ts",
     "demo": "tsx scripts/demo.ts"

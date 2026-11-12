@@ -135,5 +135,6 @@ Uma boa primeira mensagem para ele: **"Lê o STATUS.md e me diz onde paramos."**
 | Começar uma tarefa | `git checkout -b feat/F05-ligas` |
 | Salvar meu trabalho | `git add . && git commit -m "feat(F05): ..." && git push` |
 | Trazer novidades para minha branch | `git fetch && git merge origin/hmg` |
-| Rodar o site localmente | `npm run emulators` (terminal 1), `npm run seed` e depois `npm run dev` (terminal 2) |
+| Rodar o site localmente | `npm run emulators` (terminal 1), `npm run seed` (só na primeira vez) e depois `npm run dev` (terminal 2) |
+| Salvar / zerar o banco local | `npm run emulators:save` / `npm run emulators:reset` (fica em `.emulator-data`, fora do Git) |
 | Conferir se nada quebrou | `npm run typecheck && npm test` |
