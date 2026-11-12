@@ -24,7 +24,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [claims, setClaims] = useState<{ admin: boolean; mesario: boolean }>({ admin: false, mesario: false });
   const [loading, setLoading] = useState(true);
   const [loginOpen, setLoginOpen] = useState(false);
-  const { data: profile } = useDocument(user ? refs.user(user.uid) : null);
+  const { data: profile, loading: profileLoading } = useDocument(user ? refs.user(user.uid) : null);
+
+  useEffect(() => {
+    if (user && !loading && !profileLoading && !profile) ensureProfile(user).catch((error) => console.error(error));
+  }, [user, loading, profileLoading, profile]);
 
   useEffect(
     () =>
