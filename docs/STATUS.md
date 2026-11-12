@@ -94,6 +94,7 @@ Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou,
 - URL de clone no tutorial corrigida para `BTFreitass/Copa-Kaleo2`.
 - **Bug grave corrigido: o site inteiro travava em loop infinito de renderização** ("Maximum update depth exceeded") e a maioria das páginas abria vazia. Causa: `converter()` em `apps/web/src/shared/lib/data.ts` criava um conversor novo a cada chamada, então `refEqual`/`queryEqual` nunca davam iguais e os hooks reabriam a escuta sem parar. Agora o conversor é único.
 - Corrigidas as regras de leitura de `predictions`, `longTermPredictions` e `checkins`: ler um documento que ainda não existe (ex.: palpite em jogo sem palpite) dava permissão negada. Agora o `get` confere o ID (`<id>_<uid>`).
+- Links do rodapé (Inscrições e Copa Fácil) movidos para a barra de cima, a pedido do Bruno. O menu completo aparece a partir de 1280 px; abaixo disso, fica no menu ☰.
 - Novo `npm run demo` (`scripts/demo.ts`): depois do `npm run seed`, deixa o torneio no meio do dia nos emuladores. São 6 jogos encerrados com gols, cartões, check-ins e craque, 1 jogo ao vivo, palpites, a liga "Galera da Igreja", o mural e pacotes abertos. Só mexe nos emuladores, nunca em produção.
 
 ### 2026-11-11 (noite) · Bruno
