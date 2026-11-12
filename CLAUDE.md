@@ -66,6 +66,7 @@ npm run emulators:save     # opcional — salva o banco local agora, com os emul
 npm run emulators:reset    # apaga o banco local (com os emuladores desligados) para começar do zero
 npm run dev                # terminal 2 — site em http://localhost:5173
 npm run demo               # opcional, depois do seed — deixa o torneio "no meio do dia" (6 jogos encerrados, 1 ao vivo, mural, figurinhas)
+npm run mysql:sync         # opcional — copia o Firestore local para o MySQL (banco copa_kaleo) para ver no Workbench; --prod lê o Firebase real. Credenciais no .env (veja .env.example)
 npm run simulate           # opcional — joga o torneio inteiro e confere ~30 comportamentos
 npm test                   # testes de domínio
 npm run typecheck

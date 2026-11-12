@@ -18,12 +18,14 @@
     "emulators:reset": "node -e \"require('fs').rmSync('.emulator-data',{recursive:true,force:true})\"",
     "seed": "tsx scripts/seed.ts",
     "simulate": "tsx scripts/simulate.ts",
-    "demo": "tsx scripts/demo.ts"
+    "demo": "tsx scripts/demo.ts",
+    "mysql:sync": "tsx scripts/mysql-sync.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
     "esbuild": "^0.28.2",
     "firebase-admin": "^14.5.0",
+    "mysql2": "^3.11.5",
     "tsx": "^4.23.15",
     "typescript": "~5.9.3",
     "vitest": "^5.1.0"
