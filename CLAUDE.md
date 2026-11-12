@@ -7,6 +7,18 @@ Portal do torneio Copa Kaleo, migrando de landing page estática (`public/index.
 2. Leia [docs/STATUS.md](docs/STATUS.md): onde paramos, próximos passos, problemas conhecidos e quem está mexendo em quê. Não pegue uma tarefa que o outro colaborador marcou.
 3. Nunca commite direto na `main` (produção) nem na `hmg` (homologação). Para uma tarefa nova, crie `feat/<ID>-assunto` ou `fix/<assunto>` a partir da `hmg` atualizada.
 
+## Antes de alterar QUALQUER coisa (obrigatório, toda vez)
+Não basta conferir no início da sessão: o outro colaborador (Bruno ou Kaio) pode ter publicado algo há poucos minutos. Confira commits, branches novas e PRs (`gh pr list --repo BTFreitass/Copa-Kaleo2`). **Antes de cada alteração** (editar arquivo, commit, push, merge, deploy ou mudança no Firebase/console), rode:
+```bash
+git fetch --all --prune
+git status -sb
+git log --oneline HEAD..origin/hmg
+git log --oneline HEAD..origin/<sua-branch>
+```
+- Se aparecer algum commit novo: **pare**, avise o usuário do que chegou (autor e mensagem), traga as mudanças (`git pull` ou `git merge origin/hmg`) e releia o [docs/STATUS.md](docs/STATUS.md) antes de continuar.
+- Se o STATUS.md mostrar que o outro colaborador está mexendo nos mesmos arquivos ou na mesma área, não altere: avise o usuário e combine antes.
+- Se a sua branch e a remota divergirem, nunca use `push --force`. Faça merge e resolva os conflitos.
+
 ## Registro contínuo (obrigatório, vale para os dois colaboradores)
 O outro colaborador e o Claude dele dependem do [docs/STATUS.md](docs/STATUS.md) para saber o que está acontecendo. Registre **na hora**, não só no fim da sessão:
 
@@ -48,9 +60,13 @@ O fluxo completo para humanos está em [docs/COLABORACAO.md](docs/COLABORACAO.md
 ## Rodando localmente
 ```bash
 npm install
-npm run emulators          # terminal 1 — Auth, Firestore, RTDB, Storage, Functions (UI em :4000)
-npm run seed               # terminal 2 — 8 times, 16 jogos, 12 torcedores, admin e mesário
+npm run emulators          # terminal 1 — Auth, Firestore, RTDB, Storage, Functions (UI em :4000). Carrega o banco local de .emulator-data se existir e salva ao fechar com Ctrl+C
+npm run seed               # terminal 2 — só na primeira vez (ou depois de emulators:reset): 8 times, 16 jogos, 12 torcedores, admin e mesário
+npm run emulators:save     # opcional — salva o banco local agora, com os emuladores rodando
+npm run emulators:reset    # apaga o banco local (com os emuladores desligados) para começar do zero
 npm run dev                # terminal 2 — site em http://localhost:5173
+npm run demo               # opcional, depois do seed — deixa o torneio "no meio do dia" (6 jogos encerrados, 1 ao vivo, mural, figurinhas)
+npm run mysql:sync         # opcional — copia o Firestore local para o MySQL (banco copa_kaleo) para ver no Workbench; --prod lê o Firebase real. Credenciais no .env (veja .env.example)
 npm run simulate           # opcional — joga o torneio inteiro e confere ~30 comportamentos
 npm test                   # testes de domínio
 npm run typecheck

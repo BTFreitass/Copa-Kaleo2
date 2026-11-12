@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { doc, increment, updateDoc, writeBatch } from 'firebase/firestore';
-import { ArrowLeft, Clock, Flag, Pause, Play, Undo2, WifiOff } from 'lucide-react';
-import { activeEvents, matchMinute, type Match, type MatchEvent, type MatchEventType, type Player } from '@copa/shared';
+import { ArrowLeft, Clock, Undo2, WifiOff } from 'lucide-react';
+import { activeEvents, matchClock, matchTiming, type Match, type MatchEvent, type MatchEventType, type Player } from '@copa/shared';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTournament } from '@/features/tournament/TournamentProvider';
 import { cols, queries, refs } from '@/shared/lib/collections';
@@ -12,6 +12,7 @@ import { api, errorMessage } from '@/shared/lib/api';
 import { Button, Card, EmptyState, Field, Input, Modal, PageLoader, TeamCrest, useToast } from '@/shared/ui';
 import { cn } from '@/shared/utils/format';
 import { Timeline, slotName } from '@/features/matches/components';
+import { ClockPanel } from './ClockPanel';
 
 type Pending = { type: MatchEventType; side: 'home' | 'away' } | null;
 
@@ -27,9 +28,11 @@ export function MesarioPage() {
   const [penalties, setPenalties] = useState(false);
   const online = typeof navigator === 'undefined' ? true : navigator.onLine;
 
-  const half = Math.round((tournament?.format.matchDurationMin ?? 30) / 2);
+  const timing = matchTiming(tournament?.format);
+  const half = timing.halfMin;
   const m = match.data;
-  const minute = m ? matchMinute(m, half, now) ?? (m.period === 2 ? half : 1) : 1;
+  const clock = m ? matchClock(m, half, now) : null;
+  const minute = m?.status === 'halftime' ? half : clock?.minute ?? 1;
   const list = useMemo(() => activeEvents(events.data), [events.data]);
 
   if (!isMesario) return <EmptyState title="Acesso restrito a mesários" />;
@@ -40,9 +43,6 @@ export function MesarioPage() {
   const matchRef = refs.match(m.id);
   const update = (patch: Partial<Match>) => updateDoc(matchRef, patch).catch((e) => toast(errorMessage(e), 'error'));
 
-  const start = () => update({ status: 'live', period: 1, clockStartedAt: Date.now(), kickoffAt: Math.min(m.kickoffAt, Date.now()) });
-  const halftime = () => update({ status: 'halftime' });
-  const secondHalf = () => update({ status: 'live', period: 2, clockStartedAt: Date.now() });
   const finish = () => {
     const isKnockout = m.stage !== 'group';
     if (isKnockout && m.score.home === m.score.away && !m.penalties) {
@@ -101,7 +101,6 @@ export function MesarioPage() {
     }
   };
 
-  const live = m.status === 'live';
   const roster = (side: 'home' | 'away') => players.filter((p) => p.teamId === (side === 'home' ? m.homeTeamId : m.awayTeamId)).sort((a, b) => a.number - b.number);
 
   return (
@@ -122,24 +121,16 @@ export function MesarioPage() {
           ))}
           <div className="order-2 flex flex-col items-center">
             <span className="text-6xl font-black tabular-nums">{m.score.home}:{m.score.away}</span>
-            <span className={cn('flex items-center gap-1 text-sm font-bold', live ? 'text-red-300' : 'text-gray-400')}>
+            <span className={cn('flex items-center gap-1 text-sm font-bold', clock?.running ? 'text-red-300' : 'text-gray-400')}>
               <Clock className="size-4" />
-              {m.status === 'scheduled' ? 'Não iniciado' : m.status === 'halftime' ? 'Intervalo' : m.status === 'finished' ? 'Encerrado' : `${m.period}º tempo · ${minute}'`}
+              {m.status === 'scheduled' ? 'Não iniciado' : m.status === 'halftime' ? 'Intervalo' : m.status === 'finished' ? 'Encerrado' : `${m.period}º tempo · ${clock?.label}${clock?.running ? '' : ' · pausado'}`}
             </span>
             {m.penalties && <span className="text-xs text-gray-400">Pên. {m.penalties.home}x{m.penalties.away}</span>}
           </div>
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 gap-2">
-        {m.status === 'scheduled' && <Button size="xl" variant="success" className="col-span-2" icon={<Play className="size-6" />} onClick={start}>Iniciar jogo</Button>}
-        {m.status === 'live' && m.period === 1 && <Button size="lg" variant="secondary" icon={<Pause className="size-5" />} onClick={halftime}>Intervalo</Button>}
-        {m.status === 'halftime' && <Button size="lg" variant="success" icon={<Play className="size-5" />} onClick={secondHalf}>2º tempo</Button>}
-        {(m.status === 'live' || m.status === 'halftime') && <Button size="lg" variant="danger" icon={<Flag className="size-5" />} onClick={finish}>Encerrar</Button>}
-        {m.status === 'finished' && (
-          <Button size="lg" variant="secondary" className="col-span-2" onClick={() => update({ status: 'live', finishedAt: null })}>Reabrir jogo (correção)</Button>
-        )}
-      </div>
+      <ClockPanel match={m} half={half} halftimeMin={timing.halftimeMin} update={update} onFinish={finish} />
 
       {m.status !== 'scheduled' && (
         <div className="grid grid-cols-2 gap-3">

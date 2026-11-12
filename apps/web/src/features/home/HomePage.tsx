@@ -165,7 +165,7 @@ function SectionTitle({ title, to }: { title: string; to: string }) {
 function QuickLink({ to, icon, title, text }: { to: string; icon: React.ReactNode; title: string; text: string }) {
   return (
     <Link to={to} className="group flex items-center gap-4 rounded-2xl border border-gray-800 bg-gray-900/60 p-4 transition hover:border-purple-500/50">
-      <span className="rounded-xl bg-gradient-brand p-2.5 text-white [&>svg]:size-5">{icon}</span>
+      <span className="rounded-xl bg-gradient-brand p-2.5 text-snow [&>svg]:size-5">{icon}</span>
       <span>
         <span className="block font-bold text-white">{title}</span>
         <span className="text-xs text-gray-400">{text}</span>

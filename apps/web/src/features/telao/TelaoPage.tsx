@@ -57,7 +57,7 @@ export function TelaoPage() {
   const sponsor = sponsors.length ? sponsors[sponsorIndex % sponsors.length] : null;
 
   return (
-    <div className="grid h-screen grid-cols-[1fr_420px] gap-6 overflow-hidden bg-[radial-gradient(circle_at_20%_0%,#1e3a8a_0%,#030712_50%)] p-8 text-white">
+    <div className="dark grid h-screen grid-cols-[1fr_420px] gap-6 overflow-hidden bg-[radial-gradient(circle_at_20%_0%,#1e3a8a_0%,#030712_50%)] p-8 text-white">
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-4">
           <img src="/img/Kaleo.jpg" alt="" className="size-16 rounded-2xl" />

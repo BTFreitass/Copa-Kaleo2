@@ -2,6 +2,8 @@ import type { ActivityType, MedalRules, MedalTier, PostCategory, ScoringRules, L
 
 export const FUNCTIONS_REGION = 'southamerica-east1';
 
+export const FUTSAL_TIMING = { halfDurationMin: 20, halftimeMin: 10, halftimePresets: [10, 15] } as const;
+
 export const DEFAULT_SCORING: ScoringRules = {
   exactScore: 10,
   correctWinnerAndDiff: 7,

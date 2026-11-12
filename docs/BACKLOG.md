@@ -238,6 +238,10 @@ Sprints de 2 semanas a partir de 16/11/2026. As datas são aproximadas e serão 
 
 | Data | Decisão |
 |---|---|
+| 2026-11-12 | Tempo de jogo padrão: futsal oficial, 2 × 20 min com intervalo de 10 min (15 como alternativa rápida), editável por edição em Painel → Torneio. O cronograma reserva 2 × tempo + intervalo + tempo entre jogos. Como no futsal o cronômetro para, use o "entre jogos" como folga para o tempo real maior |
+| 2026-11-12 | F17: o relógio da partida é controlado pelo mesário (pausar, retomar, reiniciar e ajustar à mão) e não corre sozinho pelo horário de início. O 2º tempo começa em metade da duração do jogo (ex.: 15:00 num jogo de 30 min). Não há limite de acréscimos: quem decide o fim é o mesário |
+| 2026-11-12 | Identidade visual: azul (#1d4ed8, principal), vermelho (#dc2626, destaque e ao vivo) e branco, como na logo, com neutros azul-marinho. Modo claro e escuro, seguindo o sistema por padrão. As paletas `purple`/`pink` do Tailwind foram remapeadas para azul/vermelho em vez de trocar classe por classe |
+| 2026-11-12 | MySQL é só uma **cópia para consulta** (Workbench, SQL, relatórios), gerada por `npm run mysql:sync`. O Firestore continua sendo a fonte da verdade e o site não usa MySQL. Trocar o Firebase pelo MySQL foi descartado (reescrita grande, perde o tempo real, exige servidor e hospedagem) |
 | 2026-11-10 | Stack: Vite + React Router + TS + Tailwind + Lucide + TanStack Query + Zod, Firebase (Firestore, Auth, Storage, Hosting, Functions v2) |
 | 2026-11-10 | Todas as funcionalidades F01–F21 aprovadas para o escopo |
 | 2026-11-10 | Nova funcionalidade F22: medalha por usuário por edição |

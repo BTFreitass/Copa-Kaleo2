@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { doc, updateDoc, writeBatch } from 'firebase/firestore';
-import { AlertTriangle, Flag, Hammer, Medal, Sticker, Trophy } from 'lucide-react';
+import { AlertTriangle, Flag, Hammer, Medal, Sticker, Timer, Trophy } from 'lucide-react';
 import {
+  FUTSAL_TIMING,
+  matchTiming,
   STAGE_LABEL,
   buildTournament,
   describeSlot,
@@ -83,6 +85,14 @@ export function TournamentAdmin() {
     }
   };
 
+  const timing = matchTiming(f);
+  const setTiming = (patch: { halfDurationMin?: number; halftimeMin?: number }) => {
+    const next = { ...f, halfDurationMin: timing.halfMin, halftimeMin: timing.halftimeMin, ...patch };
+    setFormat({ ...next, matchDurationMin: next.halfDurationMin * 2 });
+  };
+  const saveTiming = () =>
+    run('timing', () => updateDoc(refs.tournament(tournamentId), { format: { ...f, halfDurationMin: timing.halfMin, halftimeMin: timing.halftimeMin, matchDurationMin: timing.playMin, teamCount: teams.length } }), 'Tempo de jogo salvo.');
+
   const saveInfo = () => run('info', () => updateDoc(refs.tournament(tournamentId), { name: i.name, eventDate: i.eventDate, format: { ...f, teamCount: teams.length } }), 'Torneio atualizado.');
 
   const generate = () =>
@@ -116,6 +126,8 @@ export function TournamentAdmin() {
             status: 'scheduled',
             period: 1,
             clockStartedAt: null,
+            clockElapsedMs: 0,
+            clockRunning: false,
             score: { home: 0, away: 0 },
             penalties: null,
             finishedAt: null,
@@ -156,13 +168,41 @@ export function TournamentAdmin() {
       </Card>
 
       <Card className="p-5">
+        <h2 className="mb-1 flex items-center gap-2 text-lg font-black"><Timer className="size-5" /> Tempo de jogo</h2>
+        <p className="mb-4 text-sm text-gray-400">
+          Vale para o cronômetro do mesário e para o cronograma do dia. Padrão oficial do futsal: 2 × {FUTSAL_TIMING.halfDurationMin} min.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Field label="Cada tempo (min)" hint={`Jogo de ${timing.playMin} min`}>
+            <div className="flex gap-2">
+              <Input type="number" min={5} max={45} value={timing.halfMin} onChange={(e) => setTiming({ halfDurationMin: Number(e.target.value) })} />
+              <Button type="button" size="sm" variant="secondary" className="h-10 shrink-0" onClick={() => setTiming({ halfDurationMin: FUTSAL_TIMING.halfDurationMin })}>2×{FUTSAL_TIMING.halfDurationMin}</Button>
+            </div>
+          </Field>
+          <Field label="Intervalo da partida (min)" hint="Entre o 1º e o 2º tempo">
+            <div className="flex gap-2">
+              <Input type="number" min={0} max={30} value={timing.halftimeMin} onChange={(e) => setTiming({ halftimeMin: Number(e.target.value) })} />
+              {FUTSAL_TIMING.halftimePresets.map((n) => (
+                <Button key={n} type="button" size="sm" variant={timing.halftimeMin === n ? 'primary' : 'secondary'} className="h-10 shrink-0" onClick={() => setTiming({ halftimeMin: n })}>{n}</Button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Entre um jogo e outro (min)" hint={`Cada jogo ocupa ${timing.matchSlotMin + f.breakBetweenMatchesMin} min no cronograma`}>
+            <Input type="number" min={0} max={60} value={f.breakBetweenMatchesMin} onChange={num('breakBetweenMatchesMin')} />
+          </Field>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <Button onClick={saveTiming} loading={busy === 'timing'}>Salvar tempo de jogo</Button>
+          <span className="text-xs text-gray-500">Os horários dos jogos já gerados não mudam; para refazê-los, use o montador abaixo ou o atraso no cronograma do mesário.</span>
+        </div>
+      </Card>
+
+      <Card className="p-5">
         <h2 className="mb-1 flex items-center gap-2 text-lg font-black"><Hammer className="size-5" /> Montador de torneio</h2>
         <p className="mb-4 text-sm text-gray-400">{teams.length} times cadastrados. Defina o formato e veja o cronograma antes de gerar.</p>
-        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Grupos" hint="0 = só mata-mata"><Input type="number" min={0} max={8} value={f.groupCount} onChange={num('groupCount')} /></Field>
           <Field label="Avançam/grupo"><Input type="number" min={1} max={8} value={f.advancePerGroup} onChange={num('advancePerGroup')} /></Field>
-          <Field label="Duração (min)"><Input type="number" min={10} max={90} value={f.matchDurationMin} onChange={num('matchDurationMin')} /></Field>
-          <Field label="Intervalo (min)"><Input type="number" min={0} max={60} value={f.breakBetweenMatchesMin} onChange={num('breakBetweenMatchesMin')} /></Field>
           <Field label="Início do dia"><Input type="time" value={f.dayStartsAt} onChange={(e) => setFormat({ ...f, dayStartsAt: e.target.value })} /></Field>
           <Field label="3º lugar">
             <Select value={f.thirdPlaceMatch ? 'sim' : 'nao'} onChange={(e) => setFormat({ ...f, thirdPlaceMatch: e.target.value === 'sim' })}>

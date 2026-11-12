@@ -75,3 +75,6 @@ functions/lib/
 functions/.secret.local
 .emulator-data/
 *.tsbuildinfo
+
+# Banco local dos emuladores
+.emulator-data/

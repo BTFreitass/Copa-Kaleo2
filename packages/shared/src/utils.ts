@@ -40,11 +40,58 @@ export function isPredictionOpen(match: Pick<Match, 'status' | 'kickoffAt' | 'ho
   return match.status === 'scheduled' && now < match.kickoffAt && Boolean(match.homeTeamId && match.awayTeamId);
 }
 
-export function matchMinute(match: Pick<Match, 'status' | 'period' | 'clockStartedAt'>, halfMinutes: number, now: number) {
-  if (match.status !== 'live' || !match.clockStartedAt) return null;
-  const elapsed = Math.floor((now - match.clockStartedAt) / 60_000) + 1;
-  const offset = match.period === 2 ? halfMinutes : 0;
-  return Math.max(1, Math.min(elapsed, halfMinutes + 5)) + offset;
+type ClockFields = Pick<Match, 'status' | 'period' | 'clockStartedAt' | 'clockElapsedMs' | 'clockRunning'>;
+
+export interface MatchClock {
+  periodMs: number;
+  gameMs: number;
+  minute: number;
+  running: boolean;
+  label: string;
+}
+
+export function isClockRunning(match: ClockFields) {
+  return match.clockRunning ?? Boolean(match.clockStartedAt);
+}
+
+export function periodElapsedMs(match: ClockFields, now: number) {
+  const base = match.clockElapsedMs ?? 0;
+  if (!isClockRunning(match) || !match.clockStartedAt) return base;
+  return base + Math.max(0, now - match.clockStartedAt);
+}
+
+export function formatClock(ms: number) {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+}
+
+export function matchClock(match: ClockFields, halfMinutes: number, now: number): MatchClock {
+  const periodMs = periodElapsedMs(match, now);
+  const gameMs = periodMs + (match.period === 2 ? halfMinutes * 60_000 : 0);
+  return { periodMs, gameMs, minute: Math.floor(gameMs / 60_000) + 1, running: match.status === 'live' && isClockRunning(match), label: formatClock(gameMs) };
+}
+
+export function matchMinute(match: ClockFields, halfMinutes: number, now: number) {
+  if (match.status !== 'live') return null;
+  return matchClock(match, halfMinutes, now).minute;
+}
+
+export function clockPause(match: ClockFields, now: number): Pick<Match, 'clockElapsedMs' | 'clockRunning' | 'clockStartedAt'> {
+  return { clockElapsedMs: periodElapsedMs(match, now), clockRunning: false, clockStartedAt: null };
+}
+
+export function clockResume(match: ClockFields, now: number): Pick<Match, 'clockElapsedMs' | 'clockRunning' | 'clockStartedAt'> {
+  return { clockElapsedMs: periodElapsedMs(match, now), clockRunning: true, clockStartedAt: now };
+}
+
+export function clockSet(periodMs: number, running: boolean, now: number): Pick<Match, 'clockElapsedMs' | 'clockRunning' | 'clockStartedAt'> {
+  return { clockElapsedMs: Math.max(0, Math.round(periodMs)), clockRunning: running, clockStartedAt: running ? now : null };
+}
+
+export function parseClock(text: string) {
+  const match = /^\s*(\d{1,3})(?::([0-5]?\d))?\s*$/.exec(text);
+  if (!match) return null;
+  return (Number(match[1]) * 60 + Number(match[2] ?? 0)) * 1000;
 }
 
 export function activeEvents(events: MatchEvent[]) {

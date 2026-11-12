@@ -94,9 +94,9 @@ export function PlayerCardView({ player, team, stats }: { player: Player; team: 
     ['DIS', card.discipline, 'Disciplina'],
     ['IMP', card.impact, 'Impacto'],
   ] as const;
-  const color = team?.primaryColor ?? '#7c3aed';
+  const color = team?.primaryColor ?? '#1d4ed8';
   return (
-    <div className="relative flex size-full flex-col overflow-hidden p-6 text-white" style={{ background: `linear-gradient(160deg, ${color} 0%, #111827 55%, #030712 100%)` }}>
+    <div className="dark relative flex size-full flex-col overflow-hidden p-6 text-white" style={{ background: `linear-gradient(160deg, ${color} 0%, #111827 55%, #030712 100%)` }}>
       <div className="flex items-start justify-between">
         <div>
           <p className="text-6xl font-black leading-none">{card.overall}</p>

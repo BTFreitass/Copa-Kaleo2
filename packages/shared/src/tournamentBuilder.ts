@@ -1,4 +1,5 @@
 import type { Stage, TeamSnapshot, TournamentFormat } from './types';
+import { FUTSAL_TIMING } from './constants';
 
 export interface BuiltMatch {
   code: string;
@@ -88,10 +89,17 @@ export function buildTournament(
 
   if (seeds.length >= 2) draft.push(...buildKnockout(seeds, format.thirdPlaceMatch, format.groupCount === 0 ? teams : null));
 
-  const slot = (format.matchDurationMin + format.breakBetweenMatchesMin) * 60_000;
+  const timing = matchTiming(format);
+  const slot = (timing.matchSlotMin + format.breakBetweenMatchesMin) * 60_000;
   const matches = draft.map((m, i) => ({ ...m, order: i + 1, kickoffAt: startsAt + i * slot }));
   const last = matches[matches.length - 1];
-  return { groups, matches, endsAt: last ? last.kickoffAt + format.matchDurationMin * 60_000 : startsAt };
+  return { groups, matches, endsAt: last ? last.kickoffAt + timing.matchSlotMin * 60_000 : startsAt };
+}
+
+export function matchTiming(format: Pick<TournamentFormat, 'matchDurationMin' | 'halfDurationMin' | 'halftimeMin'> | null | undefined) {
+  const halfMin = format?.halfDurationMin ?? (format?.matchDurationMin ? Math.round(format.matchDurationMin / 2) : FUTSAL_TIMING.halfDurationMin);
+  const halftimeMin = format?.halftimeMin ?? FUTSAL_TIMING.halftimeMin;
+  return { halfMin, halftimeMin, playMin: halfMin * 2, matchSlotMin: halfMin * 2 + halftimeMin };
 }
 
 function buildKnockout(seeds: string[], thirdPlace: boolean, directTeams: Pick<TeamSnapshot, 'id'>[] | null) {

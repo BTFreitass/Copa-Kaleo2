@@ -10,6 +10,15 @@
     <link rel="icon" type="image/jpeg" href="/img/Kaleo.jpg" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>Copa Kaleo</title>
+    <script>
+      (function () {
+        var saved = null;
+        try { saved = localStorage.getItem('copa:theme'); } catch (e) {}
+        var theme = saved === 'light' || saved === 'dark' ? saved : window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        document.documentElement.classList.add(theme);
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'light' ? '#f3f6fb' : '#070d1c');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

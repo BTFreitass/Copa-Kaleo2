@@ -49,6 +49,8 @@ export interface TournamentFormat {
   advancePerGroup: number;
   thirdPlaceMatch: boolean;
   matchDurationMin: number;
+  halfDurationMin?: number;
+  halftimeMin?: number;
   breakBetweenMatchesMin: number;
   dayStartsAt: string;
 }
@@ -130,6 +132,9 @@ export interface Match {
   status: MatchStatus;
   period: 1 | 2;
   clockStartedAt: Millis | null;
+  clockElapsedMs?: number;
+  clockRunning?: boolean;
+  halftimeStartedAt?: Millis | null;
   score: Score;
   penalties: Score | null;
   finishedAt: Millis | null;

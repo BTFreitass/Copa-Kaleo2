@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { onIdTokenChanged, type User } from 'firebase/auth';
+import { onIdTokenChanged, signOut, type User } from 'firebase/auth';
 import { getDoc, setDoc } from 'firebase/firestore';
 import type { UserProfile } from '@copa/shared';
 import { auth } from '@/shared/lib/firebase';
@@ -17,6 +17,8 @@ interface AuthState {
   closeLogin: () => void;
 }
 
+const DEAD_SESSION = new Set(['auth/invalid-refresh-token', 'auth/user-token-expired', 'auth/user-not-found', 'auth/user-disabled', 'auth/invalid-user-token']);
+
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -24,20 +26,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [claims, setClaims] = useState<{ admin: boolean; mesario: boolean }>({ admin: false, mesario: false });
   const [loading, setLoading] = useState(true);
   const [loginOpen, setLoginOpen] = useState(false);
-  const { data: profile } = useDocument(user ? refs.user(user.uid) : null);
+  const { data: profile, loading: profileLoading } = useDocument(user ? refs.user(user.uid) : null);
+
+  useEffect(() => {
+    if (user && !loading && !profileLoading && !profile) ensureProfile(user).catch((error) => console.error(error));
+  }, [user, loading, profileLoading, profile]);
 
   useEffect(
     () =>
       onIdTokenChanged(auth, async (next) => {
         setUser(next);
-        if (next) {
+        if (!next) {
+          setClaims({ admin: false, mesario: false });
+          setLoading(false);
+          return;
+        }
+        try {
           const token = await next.getIdTokenResult();
           setClaims({ admin: token.claims.admin === true, mesario: token.claims.mesario === true || token.claims.admin === true });
-          await ensureProfile(next);
-        } else {
+        } catch (error) {
+          console.error(error);
           setClaims({ admin: false, mesario: false });
+          if (DEAD_SESSION.has((error as { code?: string }).code ?? '')) {
+            await signOut(auth);
+            return;
+          }
+        } finally {
+          setLoading(false);
         }
-        setLoading(false);
+        ensureProfile(next).catch((error) => console.error(error));
       }),
     [],
   );

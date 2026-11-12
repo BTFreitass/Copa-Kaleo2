@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  matchTiming,
+  clockPause,
+  clockResume,
+  clockSet,
+  matchClock,
+  matchMinute,
+  parseClock,
   DEFAULT_MEDAL_RULES,
   DEFAULT_SCORING,
   bracketOrder,
@@ -54,7 +61,7 @@ describe('buildTournament', () => {
     expect(byStage('third_place')).toHaveLength(1);
     expect(result.matches.at(-1)?.code).toBe('F');
     expect(result.matches).toHaveLength(16);
-    expect(result.endsAt).toBe(15 * 40 * 60_000 + 30 * 60_000);
+    expect(result.endsAt).toBe(15 * 50 * 60_000 + 40 * 60_000);
   });
 
   it('nenhum time joga duas vezes seguidas na fase de grupos com 2 grupos', () => {
@@ -167,5 +174,57 @@ describe('extractYouTubeId', () => {
     expect(extractYouTubeId('https://youtu.be/y8e9RoHuEHY')).toEqual({ id: 'y8e9RoHuEHY', start: null });
     expect(extractYouTubeId('https://www.youtube.com/live/y8e9RoHuEHY?si=abc')?.id).toBe('y8e9RoHuEHY');
     expect(extractYouTubeId('nada')).toBeNull();
+  });
+});
+
+describe('cronômetro da partida', () => {
+  const base = { status: 'live' as const, period: 1 as const, clockStartedAt: 1_000_000, clockElapsedMs: 0, clockRunning: true };
+
+  it('conta o tempo enquanto roda e congela quando pausa', () => {
+    expect(matchClock(base, 15, 1_000_000 + 125_000).label).toBe('02:05');
+    const paused = { ...base, ...clockPause(base, 1_000_000 + 125_000) };
+    expect(paused.clockRunning).toBe(false);
+    expect(matchClock(paused, 15, 9_999_999).label).toBe('02:05');
+    const resumed = { ...paused, ...clockResume(paused, 2_000_000) };
+    expect(matchClock(resumed, 15, 2_000_000 + 10_000).label).toBe('02:15');
+  });
+
+  it('o 2º tempo começa no meio do jogo e o minuto do lance acompanha', () => {
+    const second = { ...base, period: 2 as const, ...clockSet(0, true, 5_000_000) };
+    const clock = matchClock(second, 15, 5_000_000 + 61_000);
+    expect(clock.label).toBe('16:01');
+    expect(clock.minute).toBe(17);
+  });
+
+  it('ajuste manual e leitura de mm:ss', () => {
+    expect(parseClock('12:30')).toBe(750_000);
+    expect(parseClock('7')).toBe(420_000);
+    expect(parseClock('abc')).toBeNull();
+    const set = { ...base, ...clockSet(750_000, false, 3_000_000) };
+    expect(matchClock(set, 15, 4_000_000).label).toBe('12:30');
+  });
+
+  it('jogos antigos sem os campos novos continuam funcionando', () => {
+    const legacy = { status: 'live' as const, period: 1 as const, clockStartedAt: 1_000_000 };
+    expect(matchMinute(legacy, 15, 1_000_000 + 30_000)).toBe(1);
+    expect(matchMinute({ ...legacy, status: 'halftime' }, 15, 2_000_000)).toBeNull();
+  });
+});
+
+describe('tempo de jogo', () => {
+  it('usa o padrão oficial do futsal quando nada foi configurado', () => {
+    expect(matchTiming(null)).toEqual({ halfMin: 20, halftimeMin: 10, playMin: 40, matchSlotMin: 50 });
+  });
+
+  it('respeita metade e intervalo configurados e o cronograma soma tudo', () => {
+    const format = { teamCount: 4, groupCount: 0, advancePerGroup: 1, thirdPlaceMatch: false, matchDurationMin: 40, halfDurationMin: 20, halftimeMin: 15, breakBetweenMatchesMin: 5, dayStartsAt: '08:00' };
+    expect(matchTiming(format).matchSlotMin).toBe(55);
+    const teams = ['A', 'B', 'C', 'D'].map((id) => ({ id, name: id, shortName: id, logoUrl: '', primaryColor: '#000' }));
+    const built = buildTournament(format, teams, 0);
+    expect(built.matches[1]!.kickoffAt - built.matches[0]!.kickoffAt).toBe(60 * 60_000);
+  });
+
+  it('torneios antigos só com a duração total continuam funcionando', () => {
+    expect(matchTiming({ matchDurationMin: 30 }).halfMin).toBe(15);
   });
 });

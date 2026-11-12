@@ -15,14 +15,18 @@ import {
   Trophy,
   X,
   ClipboardList,
+  ExternalLink,
+  UserPlus,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { authService } from '@/features/auth/authService';
 import { useTournament } from '@/features/tournament/TournamentProvider';
-import { Avatar, LiveDot } from '@/shared/ui';
+import { LiveDot } from '@/shared/ui';
 import { cn } from '@/shared/utils/format';
 import { SponsorsStrip } from '@/features/sponsors/Sponsors';
 import { useFavoriteTheme } from '@/features/gamification/useFavoriteTheme';
+import { UserMenu } from './UserMenu';
+import { ThemeToggle } from './ThemeToggle';
 
 const NAV = [
   { to: '/', label: 'Início', icon: Home, end: true },
@@ -34,12 +38,15 @@ const NAV = [
   { to: '/figurinhas', label: 'Figurinhas', icon: Sticker },
   { to: '/midia', label: 'Mídia', icon: Camera },
   { to: '/hall-da-fama', label: 'Hall da Fama', icon: Trophy },
+  { to: '/inscricao', label: 'Inscrições', icon: UserPlus },
 ];
+
+const COPA_FACIL = 'https://copafacil.com/4copakaleo';
 
 const MOBILE_NAV = [NAV[0]!, NAV[1]!, NAV[5]!, NAV[4]!, NAV[6]!];
 
 export function PublicLayout() {
-  const { user, profile, isAdmin, isMesario, openLogin } = useAuth();
+  const { user, isAdmin, isMesario, openLogin } = useAuth();
   const { liveMatch } = useTournament();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -56,14 +63,14 @@ export function PublicLayout() {
             <span className="text-xl font-black uppercase tracking-tighter text-gradient">Copa Kaleo</span>
           </Link>
 
-          <nav className="hidden flex-1 items-center gap-0.5 overflow-x-auto lg:flex">
+          <nav className="hidden min-w-0 flex-1 items-center gap-0.5 xl:flex">
             {NAV.slice(1).map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition',
+                    'flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-semibold transition',
                     isActive ? 'bg-gray-800 text-white' : 'text-gray-400 hover:text-white',
                   )
                 }
@@ -72,33 +79,29 @@ export function PublicLayout() {
                 {item.label}
               </NavLink>
             ))}
+            <a href={COPA_FACIL} target="_blank" rel="noreferrer" className="flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-semibold text-gray-400 transition hover:text-white">
+              Copa Fácil
+              <ExternalLink className="size-3.5" />
+            </a>
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
-            {(isAdmin || isMesario) && (
-              <Link to={isAdmin ? '/admin' : '/admin/jogos'} className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-purple-300 hover:bg-gray-800 sm:flex">
-                <Shield className="size-4" />
-                Painel
-              </Link>
-            )}
+            <ThemeToggle />
             {user ? (
-              <Link to="/perfil" className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 hover:bg-gray-800">
-                <Avatar name={profile?.displayName ?? 'Torcedor'} src={profile?.photoURL} size="sm" />
-                <span className="hidden max-w-28 truncate text-sm font-semibold sm:block">{profile?.displayName ?? '...'}</span>
-              </Link>
+              <UserMenu />
             ) : (
-              <button onClick={openLogin} className="flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-bold text-white">
+              <button onClick={openLogin} className="flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-bold text-snow">
                 <LogIn className="size-4" />
                 Entrar
               </button>
             )}
-            <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 lg:hidden" onClick={() => setMenuOpen(true)} aria-label="Menu">
+            <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 xl:hidden" onClick={() => setMenuOpen(true)} aria-label="Menu">
               <Menu className="size-5" />
             </button>
           </div>
         </div>
         {liveMatch && location.pathname !== '/ao-vivo' && (
-          <Link to="/ao-vivo" className="flex items-center justify-center gap-3 bg-red-600/90 px-4 py-1.5 text-sm font-bold text-white">
+          <Link to="/ao-vivo" className="flex items-center justify-center gap-3 bg-red-600/90 px-4 py-1.5 text-sm font-bold text-snow">
             <LiveDot />
             AO VIVO · {liveMatch.home?.shortName} {liveMatch.score.home} x {liveMatch.score.away} {liveMatch.away?.shortName}
           </Link>
@@ -106,7 +109,7 @@ export function PublicLayout() {
       </header>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm lg:hidden" onClick={() => setMenuOpen(false)}>
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm xl:hidden" onClick={() => setMenuOpen(false)}>
           <aside className="ml-auto flex h-full w-72 flex-col gap-1 bg-gray-950 p-4 animate-pop" onClick={(e) => e.stopPropagation()}>
             <button className="mb-2 ml-auto rounded-lg p-2 text-gray-400" onClick={() => setMenuOpen(false)} aria-label="Fechar menu">
               <X className="size-5" />
@@ -123,10 +126,10 @@ export function PublicLayout() {
                 {item.label}
               </NavLink>
             ))}
-            <NavLink to="/inscricao" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold text-gray-400">
-              <ClipboardList className="size-5" />
-              Inscrição de times
-            </NavLink>
+            <a href={COPA_FACIL} target="_blank" rel="noreferrer" className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold text-gray-400">
+              <ExternalLink className="size-5" />
+              Copa Fácil
+            </a>
             {(isAdmin || isMesario) && (
               <NavLink to="/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold text-purple-300">
                 <Shield className="size-5" />
@@ -149,14 +152,7 @@ export function PublicLayout() {
 
       <footer className="mt-10 border-t border-gray-800 bg-gray-950">
         <SponsorsStrip />
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-6 text-sm text-gray-500 sm:flex-row">
-          <span>© {new Date().getFullYear()} Copa Kaleo</span>
-          <div className="flex gap-4">
-            <Link to="/inscricao" className="hover:text-gray-300">Inscrições</Link>
-            <Link to="/hall-da-fama" className="hover:text-gray-300">Hall da Fama</Link>
-            <a href="https://copafacil.com/4copakaleo" target="_blank" rel="noreferrer" className="hover:text-gray-300">Copa Fácil</a>
-          </div>
-        </div>
+        <div className="mx-auto max-w-7xl px-4 py-6 text-center text-sm text-gray-500">© {new Date().getFullYear()} Copa Kaleo</div>
       </footer>
 
       <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-gray-800 bg-gray-950/95 backdrop-blur md:hidden">
