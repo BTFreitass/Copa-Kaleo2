@@ -8,7 +8,7 @@ Portal do torneio Copa Kaleo, migrando de landing page estática (`public/index.
 3. Nunca commite direto na `main` (produção) nem na `hmg` (homologação). Para uma tarefa nova, crie `feat/<ID>-assunto` ou `fix/<assunto>` a partir da `hmg` atualizada.
 
 ## Antes de alterar QUALQUER coisa (obrigatório, toda vez)
-Não basta conferir no início da sessão: o outro colaborador pode ter publicado algo há poucos minutos. **Antes de cada alteração** (editar arquivo, commit, push, merge, deploy ou mudança no Firebase/console), rode:
+Não basta conferir no início da sessão: o outro colaborador (Bruno ou Kaio) pode ter publicado algo há poucos minutos. Confira commits, branches novas e PRs (`gh pr list --repo BTFreitass/Copa-Kaleo2`). **Antes de cada alteração** (editar arquivo, commit, push, merge, deploy ou mudança no Firebase/console), rode:
 ```bash
 git fetch --all --prune
 git status -sb
