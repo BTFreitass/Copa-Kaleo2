@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  matchTiming,
   clockPause,
   clockResume,
   clockSet,
@@ -60,7 +61,7 @@ describe('buildTournament', () => {
     expect(byStage('third_place')).toHaveLength(1);
     expect(result.matches.at(-1)?.code).toBe('F');
     expect(result.matches).toHaveLength(16);
-    expect(result.endsAt).toBe(15 * 40 * 60_000 + 30 * 60_000);
+    expect(result.endsAt).toBe(15 * 50 * 60_000 + 40 * 60_000);
   });
 
   it('nenhum time joga duas vezes seguidas na fase de grupos com 2 grupos', () => {
@@ -207,5 +208,23 @@ describe('cronômetro da partida', () => {
     const legacy = { status: 'live' as const, period: 1 as const, clockStartedAt: 1_000_000 };
     expect(matchMinute(legacy, 15, 1_000_000 + 30_000)).toBe(1);
     expect(matchMinute({ ...legacy, status: 'halftime' }, 15, 2_000_000)).toBeNull();
+  });
+});
+
+describe('tempo de jogo', () => {
+  it('usa o padrão oficial do futsal quando nada foi configurado', () => {
+    expect(matchTiming(null)).toEqual({ halfMin: 20, halftimeMin: 10, playMin: 40, matchSlotMin: 50 });
+  });
+
+  it('respeita metade e intervalo configurados e o cronograma soma tudo', () => {
+    const format = { teamCount: 4, groupCount: 0, advancePerGroup: 1, thirdPlaceMatch: false, matchDurationMin: 40, halfDurationMin: 20, halftimeMin: 15, breakBetweenMatchesMin: 5, dayStartsAt: '08:00' };
+    expect(matchTiming(format).matchSlotMin).toBe(55);
+    const teams = ['A', 'B', 'C', 'D'].map((id) => ({ id, name: id, shortName: id, logoUrl: '', primaryColor: '#000' }));
+    const built = buildTournament(format, teams, 0);
+    expect(built.matches[1]!.kickoffAt - built.matches[0]!.kickoffAt).toBe(60 * 60_000);
+  });
+
+  it('torneios antigos só com a duração total continuam funcionando', () => {
+    expect(matchTiming({ matchDurationMin: 30 }).halfMin).toBe(15);
   });
 });

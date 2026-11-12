@@ -20,7 +20,7 @@ function phaseOf(match: Match): Phase | null {
   return null;
 }
 
-export function ClockPanel({ match, half, update, onFinish }: { match: Match; half: number; update: (patch: Partial<Match>) => void; onFinish: () => void }) {
+export function ClockPanel({ match, half, halftimeMin, update, onFinish }: { match: Match; half: number; halftimeMin: number; update: (patch: Partial<Match>) => void; onFinish: () => void }) {
   const now = useNow(500);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [editing, setEditing] = useState(false);
@@ -31,8 +31,9 @@ export function ClockPanel({ match, half, update, onFinish }: { match: Match; ha
   const startFirst = () => update({ status: 'live', period: 1, ...clockSet(0, true, Date.now()), kickoffAt: Math.min(match.kickoffAt, Date.now()) });
   const pause = () => update(clockPause(match, Date.now()));
   const resume = () => update(clockResume(match, Date.now()));
-  const toHalftime = () => update({ status: 'halftime', ...clockPause(match, Date.now()) });
-  const startSecond = () => update({ status: 'live', period: 2, ...clockSet(0, true, Date.now()) });
+  const toHalftime = () => update({ status: 'halftime', halftimeStartedAt: Date.now(), ...clockPause(match, Date.now()) });
+  const startSecond = () => update({ status: 'live', period: 2, halftimeStartedAt: null, ...clockSet(0, true, Date.now()) });
+  const halftimeLeftMs = match.halftimeStartedAt ? match.halftimeStartedAt + halftimeMin * 60_000 - now : halftimeMin * 60_000;
   const restart = () => update(clockSet(0, clock.running, Date.now()));
 
   const goTo = (target: Phase) => {
@@ -75,12 +76,23 @@ export function ClockPanel({ match, half, update, onFinish }: { match: Match; ha
       </div>
 
       <div className="flex flex-col items-center">
-        <span className={cn('font-black tabular-nums tracking-tight', 'text-6xl', clock.running ? 'text-white' : 'text-gray-500')}>
-          {match.status === 'halftime' ? formatClock(half * 60_000) : clock.label}
-        </span>
-        <span className={cn('text-xs font-bold uppercase tracking-widest', clock.running ? 'text-red-300' : 'text-yellow-300')}>
-          {match.status === 'halftime' ? 'Intervalo' : clock.running ? `Rodando · ${clock.minute}'` : 'Pausado'}
-        </span>
+        {match.status === 'halftime' ? (
+          <>
+            <span className={cn('font-black tabular-nums tracking-tight text-6xl', halftimeLeftMs > 0 ? 'text-yellow-300' : 'text-red-400')}>
+              {halftimeLeftMs > 0 ? formatClock(halftimeLeftMs) : `+${formatClock(-halftimeLeftMs)}`}
+            </span>
+            <span className="text-xs font-bold uppercase tracking-widest text-yellow-300">
+              {halftimeLeftMs > 0 ? `Intervalo de ${halftimeMin} min · falta para o 2º tempo` : 'Intervalo estourado'}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className={cn('font-black tabular-nums tracking-tight text-6xl', clock.running ? 'text-white' : 'text-gray-500')}>{clock.label}</span>
+            <span className={cn('text-xs font-bold uppercase tracking-widest', clock.running ? 'text-red-300' : 'text-yellow-300')}>
+              {clock.running ? `Rodando · ${clock.minute}'` : 'Pausado'} · {half} min cada tempo
+            </span>
+          </>
+        )}
       </div>
 
       {match.status === 'live' && (

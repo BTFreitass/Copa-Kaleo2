@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { STAGE_LABEL, describeSlot, isPredictionOpen, matchClock, type Match, type MatchEvent } from '@copa/shared';
+import { STAGE_LABEL, describeSlot, isPredictionOpen, matchClock, matchTiming, type Match, type MatchEvent } from '@copa/shared';
 import { useNow } from '@/shared/lib/data';
 import { Badge, LiveDot, TeamCrest } from '@/shared/ui';
 import { cn, formatCountdown, formatTime } from '@/shared/utils/format';
@@ -9,13 +9,17 @@ export function useMatchClock(match: Match | null) {
   const { tournament } = useTournament();
   const now = useNow(5000);
   if (!match) return null;
-  const half = Math.round((tournament?.format.matchDurationMin ?? 30) / 2);
-  return match.status === 'live' ? matchClock(match, half, now) : null;
+  return match.status === 'live' ? matchClock(match, matchTiming(tournament?.format).halfMin, now) : null;
 }
 
 export function StatusBadge({ match }: { match: Match }) {
   const clock = useMatchClock(match);
+  const { tournament } = useTournament();
   const now = useNow(30000);
+  if (match.status === 'halftime' && match.halftimeStartedAt) {
+    const left = Math.ceil((match.halftimeStartedAt + matchTiming(tournament?.format).halftimeMin * 60_000 - now) / 60_000);
+    return <Badge tone="yellow">{left > 0 ? `Intervalo · volta em ${left} min` : 'Intervalo · já vai voltar'}</Badge>;
+  }
   if (match.status === 'live' && clock && !clock.running) return <Badge tone="yellow">⏸ Pausado · {clock.minute}'</Badge>;
   if (match.status === 'live')
     return (

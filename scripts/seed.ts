@@ -61,7 +61,9 @@ async function main() {
     groupCount: 2,
     advancePerGroup: 2,
     thirdPlaceMatch: true,
-    matchDurationMin: 30,
+    matchDurationMin: 40,
+    halfDurationMin: 20,
+    halftimeMin: 10,
     breakBetweenMatchesMin: 10,
     dayStartsAt: `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}`,
   };

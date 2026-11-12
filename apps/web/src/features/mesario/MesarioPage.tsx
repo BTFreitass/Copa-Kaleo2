@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { doc, increment, updateDoc, writeBatch } from 'firebase/firestore';
 import { ArrowLeft, Clock, Undo2, WifiOff } from 'lucide-react';
-import { activeEvents, matchClock, type Match, type MatchEvent, type MatchEventType, type Player } from '@copa/shared';
+import { activeEvents, matchClock, matchTiming, type Match, type MatchEvent, type MatchEventType, type Player } from '@copa/shared';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTournament } from '@/features/tournament/TournamentProvider';
 import { cols, queries, refs } from '@/shared/lib/collections';
@@ -28,7 +28,8 @@ export function MesarioPage() {
   const [penalties, setPenalties] = useState(false);
   const online = typeof navigator === 'undefined' ? true : navigator.onLine;
 
-  const half = Math.round((tournament?.format.matchDurationMin ?? 30) / 2);
+  const timing = matchTiming(tournament?.format);
+  const half = timing.halfMin;
   const m = match.data;
   const clock = m ? matchClock(m, half, now) : null;
   const minute = m?.status === 'halftime' ? half : clock?.minute ?? 1;
@@ -129,7 +130,7 @@ export function MesarioPage() {
         </div>
       </Card>
 
-      <ClockPanel match={m} half={half} update={update} onFinish={finish} />
+      <ClockPanel match={m} half={half} halftimeMin={timing.halftimeMin} update={update} onFinish={finish} />
 
       {m.status !== 'scheduled' && (
         <div className="grid grid-cols-2 gap-3">

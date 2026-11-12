@@ -41,7 +41,7 @@
 
 ## Problemas conhecidos
 
-- **Regras do Firestore em produção desatualizadas:** faltam a correção de leitura de palpites/check-ins inexistentes e a permissão para o mesário gravar `clockElapsedMs`/`clockRunning`. Sem isso, o cronômetro novo não funciona em produção. Já está em `firestore.rules`; falta publicar com `firebase deploy --only firestore:rules`.
+- **Regras do Firestore em produção desatualizadas:** faltam a correção de leitura de palpites/check-ins inexistentes e a permissão para o mesário gravar `clockElapsedMs`/`clockRunning`/`halftimeStartedAt`. Sem isso, o cronômetro novo não funciona em produção. Já está em `firestore.rules`; falta publicar com `firebase deploy --only firestore:rules`.
 - **Conflito previsto:** quando a `hmg` for juntada na `main`, os arquivos `.github/workflows/*.yml` vão dar conflito (a `main` recebeu uma versão simplificada no PR #2). Resolver ficando com a versão da `hmg`.
 - O "Craque do Jogo" só aparece depois que o primeiro voto chega (a tela pode explicar melhor).
 - Notificações push (F23) não funcionam nos emuladores. Só dá para testar publicado.
@@ -54,7 +54,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| Bruno (Claude) | F17/F25 · Tempo de jogo configurável (padrão futsal 2×20, intervalo 10/15) | `docs/status-pos-merge` (PR #3) | 2026-11-12 |
+| — | — | — | — |
 
 ## Pull Requests abertos
 
@@ -95,6 +95,7 @@ Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou,
 - **Bug grave corrigido: o site inteiro travava em loop infinito de renderização** ("Maximum update depth exceeded") e a maioria das páginas abria vazia. Causa: `converter()` em `apps/web/src/shared/lib/data.ts` criava um conversor novo a cada chamada, então `refEqual`/`queryEqual` nunca davam iguais e os hooks reabriam a escuta sem parar. Agora o conversor é único.
 - Corrigidas as regras de leitura de `predictions`, `longTermPredictions` e `checkins`: ler um documento que ainda não existe (ex.: palpite em jogo sem palpite) dava permissão negada. Agora o `get` confere o ID (`<id>_<uid>`).
 - **Cópia em MySQL para o Workbench:** `sql/schema.sql` (14 tabelas com chaves estrangeiras e as views `v_jogos`, `v_classificacao`, `v_artilharia` e `v_ranking_bolao`) e `npm run mysql:sync`, que recria o banco `copa_kaleo` e copia os dados do Firestore. Por padrão lê os emuladores; com `-- --prod` lê o Firebase real (precisa de `gcloud auth application-default login`). A senha do MySQL fica no `.env`, fora do Git. Testado com o MySQL do XAMPP (MariaDB 10.11, `root` sem senha, que é o padrão do script): 14 tabelas copiadas e views conferidas com o site. O MySQL Workbench novo (26.x) **não conecta no MariaDB** (erro `explain_json_format_version`). Por isso o Bruno instalou o MySQL 8.4 oficial na **porta 3307**, ao lado do XAMPP, com o serviço `MySQL84`. A porta e a senha ficam no `.env`. Cópia testada lá também, com os acentos conferidos.
+- **Tempo de jogo configurável (padrão futsal 2×20):** novo quadro "Tempo de jogo" em Painel → Torneio, com cada tempo (padrão 20 min, botão 2×20), intervalo da partida (10 ou 15 com um toque, ou valor livre) e tempo entre um jogo e outro (o antigo campo "Intervalo" do montador, que era isso). Os valores ficam em `format.halfDurationMin` e `format.halftimeMin`, lidos por `matchTiming()`; torneios sem esses campos usam 2×20 + 10. O cronograma do dia agora soma o intervalo da partida (antes ignorava). No intervalo, o mesário vê a contagem regressiva e o site mostra "Intervalo · volta em X min" (campo novo `halftimeStartedAt`). 19/19 testes. O seed e o torneio local já estão em 2×20 + 10.
 - **Cronômetro do mesário (F17):** o mesário controla o relógio com Iniciar 1º tempo, Pausar/Retomar, Reiniciar o período, Ajustar (digitando min:seg ou com ±10 s/±1 min), Intervalo, Iniciar 2º tempo e Encerrar. O seletor 1º tempo / Intervalo / 2º tempo serve para corrigir um toque errado. O jogo ganhou os campos `clockElapsedMs` e `clockRunning`, e a conta fica em `matchClock()` no `packages/shared`, com 4 testes novos (16/16). Jogos antigos sem os campos continuam funcionando. O site mostra "⏸ Pausado" quando o relógio está parado. Testado de ponta a ponta no navegador.
 - Menu do topo sem barra de rolagem: o botão "Painel" saiu do topo (continua no menu do avatar e no menu ☰) e os links ficaram mais próximos. Cabe a partir de 1280 px mesmo logado; abaixo disso vira o menu ☰.
 - **Novo esquema de cores + modo claro/escuro:** paleta do azul, vermelho e branco da logo, com cinzas puxados para azul-marinho. Fica toda em `apps/web/src/index.css`: as classes `purple-*` agora são azul, `pink-*` agora são vermelho e `gray-*` são os neutros, e as classes `.light` e `.dark` trocam os valores. O botão ☀️/🌙 no topo alterna o modo; o padrão segue o sistema e a escolha fica salva no navegador (`copa:theme`). Para texto branco sobre fundo colorido, use `text-snow` (`text-white` inverte no modo claro). Telão, carta do jogador, figurinhas e cards de stories levam a classe `dark` para ficarem sempre escuros.
