@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { onIdTokenChanged, type User } from 'firebase/auth';
+import { onIdTokenChanged, signOut, type User } from 'firebase/auth';
 import { getDoc, setDoc } from 'firebase/firestore';
 import type { UserProfile } from '@copa/shared';
 import { auth } from '@/shared/lib/firebase';
@@ -16,6 +16,8 @@ interface AuthState {
   openLogin: () => void;
   closeLogin: () => void;
 }
+
+const DEAD_SESSION = new Set(['auth/invalid-refresh-token', 'auth/user-token-expired', 'auth/user-not-found', 'auth/user-disabled', 'auth/invalid-user-token']);
 
 const AuthContext = createContext<AuthState | null>(null);
 
@@ -45,6 +47,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (error) {
           console.error(error);
           setClaims({ admin: false, mesario: false });
+          if (DEAD_SESSION.has((error as { code?: string }).code ?? '')) {
+            await signOut(auth);
+            return;
+          }
         } finally {
           setLoading(false);
         }

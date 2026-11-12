@@ -21,10 +21,11 @@ import {
 import { useAuth } from '@/features/auth/AuthProvider';
 import { authService } from '@/features/auth/authService';
 import { useTournament } from '@/features/tournament/TournamentProvider';
-import { Avatar, LiveDot } from '@/shared/ui';
+import { LiveDot } from '@/shared/ui';
 import { cn } from '@/shared/utils/format';
 import { SponsorsStrip } from '@/features/sponsors/Sponsors';
 import { useFavoriteTheme } from '@/features/gamification/useFavoriteTheme';
+import { UserMenu } from './UserMenu';
 
 const NAV = [
   { to: '/', label: 'Início', icon: Home, end: true },
@@ -44,7 +45,7 @@ const COPA_FACIL = 'https://copafacil.com/4copakaleo';
 const MOBILE_NAV = [NAV[0]!, NAV[1]!, NAV[5]!, NAV[4]!, NAV[6]!];
 
 export function PublicLayout() {
-  const { user, profile, isAdmin, isMesario, openLogin } = useAuth();
+  const { user, isAdmin, isMesario, openLogin } = useAuth();
   const { liveMatch } = useTournament();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -91,10 +92,7 @@ export function PublicLayout() {
               </Link>
             )}
             {user ? (
-              <Link to="/perfil" className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 hover:bg-gray-800">
-                <Avatar name={profile?.displayName ?? 'Torcedor'} src={profile?.photoURL} size="sm" />
-                <span className="hidden max-w-28 truncate text-sm font-semibold sm:block">{profile?.displayName ?? '...'}</span>
-              </Link>
+              <UserMenu />
             ) : (
               <button onClick={openLogin} className="flex items-center gap-1.5 rounded-xl bg-gradient-brand px-4 py-2 text-sm font-bold text-white">
                 <LogIn className="size-4" />
