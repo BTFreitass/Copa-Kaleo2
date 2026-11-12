@@ -21,7 +21,7 @@
 | Simulação ponta a ponta | `npm run simulate`: 27/27 verificações passando (regras de segurança, bolão, mata-mata, figurinhas, cupons, medalhas, Hall da Fama) |
 | Testado no navegador | Teste automático (Chrome headless) em todas as telas públicas, do torcedor, admin, mesário e telão: carregam sem erro após as correções de 2026-11-12. Falta alguém clicar nos fluxos à mão |
 | Site oficial (`main`) | Site antigo (`public/index.html`). PR #2 mesclado (deploy automático consertado). **O deploy do merge está na fila do GitHub Actions há mais de 2 h**; enquanto não rodar, o site no ar continua com a versão anterior |
-| Homologação (`hmg`) | Site novo publicado em https://copakaleo--hmg-rkmyzien.web.app (abre vazio: produção ainda sem dados e sem Functions) |
+| Homologação (`hmg`) | Atualizada em 2026-11-12 com tudo do PR #3 (cores novas, modo claro/escuro, cronômetro do mesário, correções). https://copakaleo--hmg-rkmyzien.web.app abre vazio: produção ainda sem dados e sem Functions |
 | Firestore (produção) | Existe, em `southamerica-east1`. Regras e índices publicados. Ainda sem dados |
 | Realtime Database | Regras publicadas. Tudo fechado, exceto `transmissao/videoAtual` (escrita aberta, só texto até 40 caracteres) para o painel do site antigo continuar trocando o vídeo |
 | Storage | Ativado em `us-east1` (cota gratuita; região não pode mudar). Regras publicadas |
@@ -31,13 +31,14 @@
 
 ## Próximos passos (em ordem)
 
-1. **Destravar os deploys na fila** do GitHub Actions (`main` e `hmg`, na fila desde 2026-11-11 20:22 UTC). Ver a aba Actions do repositório; se não andarem, cancelar e rodar de novo (`gh run rerun <id> --repo BTFreitass/Copa-Kaleo2`). Depois, conferir que https://copakaleo.web.app tem a senha nova.
-2. Seu amigo abre o Claude dele e pede: "Lê o STATUS.md e me diz onde paramos".
-3. **Publicar as Functions:** `firebase.cmd deploy --only functions` (no PowerShell, use `firebase.cmd` em vez de `firebase`).
-4. **Teste manual no navegador** com `npm run emulators` + `npm run seed` + `npm run dev`. Passar por cada tela com as contas de demonstração e anotar os problemas em "Problemas conhecidos".
-5. Ativar os métodos de login no console (Google, e-mail/senha com link, telefone, anônimo; Facebook depois).
-6. Quando o site novo substituir o antigo: remover a exceção de `transmissao/videoAtual` em `database.rules.json` e publicar com `firebase deploy --only database`.
-7. Reduzir o pacote do Firebase no site (hoje ~256 KB comprimido).
+1. **Destravar o deploy da `main` na fila** (execução 43095621241, presa desde 2026-11-11 20:22 UTC). Publica o site oficial com a senha nova do painel: cancelar e rodar de novo na aba Actions **só com autorização do Bruno**. Depois, conferir que https://copakaleo.web.app tem a senha nova.
+2. **Publicar as regras do Firestore** (`firebase.cmd deploy --only firestore:rules`): sem isso, o cronômetro do mesário e a correção do bolão não funcionam em produção.
+3. Seu amigo abre o Claude dele e pede: "Lê o STATUS.md e me diz onde paramos".
+4. **Publicar as Functions:** `firebase.cmd deploy --only functions` (no PowerShell, use `firebase.cmd` em vez de `firebase`).
+5. **Teste manual no navegador** com `npm run emulators` + `npm run seed` + `npm run dev`. Passar por cada tela com as contas de demonstração e anotar os problemas em "Problemas conhecidos".
+6. Ativar os métodos de login no console (Google, e-mail/senha com link, telefone, anônimo; Facebook depois).
+7. Quando o site novo substituir o antigo: remover a exceção de `transmissao/videoAtual` em `database.rules.json` e publicar com `firebase deploy --only database`.
+8. Reduzir o pacote do Firebase no site (hoje ~256 KB comprimido).
 
 ## Problemas conhecidos
 
@@ -60,9 +61,9 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | PR | De → Para | O que faz | Situação |
 |---|---|---|---|
-| [#3](https://github.com/BTFreitass/Copa-Kaleo2/pull/3) | `docs/status-pos-merge` → `hmg` | Regra "conferir o Git antes de alterar qualquer coisa" e STATUS pós-merge | Aberto |
+| — | — | — | — |
 
-Já mesclados (2026-11-11, por Bruno (Claude)): #1 `chore/deploy-firestore` → `hmg` e #2 `hotfix/senha-site-antigo` → `main`.
+Já mesclados: #1 `chore/deploy-firestore` → `hmg` e #2 `hotfix/senha-site-antigo` → `main` (2026-11-11, Bruno (Claude)); #3 `docs/status-pos-merge` → `hmg` (2026-11-12, Bruno), com as cores novas, o modo claro/escuro, o cronômetro e o tempo de jogo do mesário, o MySQL e as correções do site.
 
 ---
 
@@ -72,6 +73,7 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 
 | Data | Quem | O que mudou | Como desfazer |
 |---|---|---|---|
+| 2026-11-12 | Bruno | PR #3 mesclado na `hmg`; deploy de homologação concluído (execução 43277623204) | `git revert -m 1 bafec80` numa branch, PR para a `hmg` |
 | 2026-11-11 | Bruno (Claude) | PR #2 mesclado na `main`: senha nova (hash) do site antigo, Copa Fácil, patrocinadores 43–51 e conserto do deploy. Deploy ainda na fila do GitHub | `git revert -m 1 1f01018` numa branch, PR para a `main` |
 | 2026-11-11 | Bruno (Claude) | PR #1 mesclado na `hmg` (deploy de homologação na fila) | `git revert -m 1 8de39cf` numa branch, PR para a `hmg` |
 | 2026-11-11 | Bruno (Claude) | Regras do Realtime Database publicadas: banco fechado, só `transmissao/videoAtual` aberto | Editar `database.rules.json` e `firebase deploy --only database` |
