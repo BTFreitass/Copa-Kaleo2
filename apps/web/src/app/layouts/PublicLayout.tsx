@@ -63,14 +63,14 @@ export function PublicLayout() {
             <span className="text-xl font-black uppercase tracking-tighter text-gradient">Copa Kaleo</span>
           </Link>
 
-          <nav className="hidden flex-1 items-center gap-0.5 overflow-x-auto xl:flex">
+          <nav className="hidden min-w-0 flex-1 items-center gap-0.5 xl:flex">
             {NAV.slice(1).map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold transition',
+                    'flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-semibold transition',
                     isActive ? 'bg-gray-800 text-white' : 'text-gray-400 hover:text-white',
                   )
                 }
@@ -79,7 +79,7 @@ export function PublicLayout() {
                 {item.label}
               </NavLink>
             ))}
-            <a href={COPA_FACIL} target="_blank" rel="noreferrer" className="flex items-center gap-1 whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-semibold text-gray-400 transition hover:text-white">
+            <a href={COPA_FACIL} target="_blank" rel="noreferrer" className="flex items-center gap-1 whitespace-nowrap rounded-lg px-2 py-2 text-sm font-semibold text-gray-400 transition hover:text-white">
               Copa Fácil
               <ExternalLink className="size-3.5" />
             </a>
@@ -87,12 +87,6 @@ export function PublicLayout() {
 
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
-            {(isAdmin || isMesario) && (
-              <Link to={isAdmin ? '/admin' : '/admin/jogos'} className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-purple-300 hover:bg-gray-800 sm:flex">
-                <Shield className="size-4" />
-                Painel
-              </Link>
-            )}
             {user ? (
               <UserMenu />
             ) : (
