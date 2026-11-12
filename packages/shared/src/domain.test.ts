@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  clockPause,
+  clockResume,
+  clockSet,
+  matchClock,
+  matchMinute,
+  parseClock,
   DEFAULT_MEDAL_RULES,
   DEFAULT_SCORING,
   bracketOrder,
@@ -167,5 +173,39 @@ describe('extractYouTubeId', () => {
     expect(extractYouTubeId('https://youtu.be/y8e9RoHuEHY')).toEqual({ id: 'y8e9RoHuEHY', start: null });
     expect(extractYouTubeId('https://www.youtube.com/live/y8e9RoHuEHY?si=abc')?.id).toBe('y8e9RoHuEHY');
     expect(extractYouTubeId('nada')).toBeNull();
+  });
+});
+
+describe('cronômetro da partida', () => {
+  const base = { status: 'live' as const, period: 1 as const, clockStartedAt: 1_000_000, clockElapsedMs: 0, clockRunning: true };
+
+  it('conta o tempo enquanto roda e congela quando pausa', () => {
+    expect(matchClock(base, 15, 1_000_000 + 125_000).label).toBe('02:05');
+    const paused = { ...base, ...clockPause(base, 1_000_000 + 125_000) };
+    expect(paused.clockRunning).toBe(false);
+    expect(matchClock(paused, 15, 9_999_999).label).toBe('02:05');
+    const resumed = { ...paused, ...clockResume(paused, 2_000_000) };
+    expect(matchClock(resumed, 15, 2_000_000 + 10_000).label).toBe('02:15');
+  });
+
+  it('o 2º tempo começa no meio do jogo e o minuto do lance acompanha', () => {
+    const second = { ...base, period: 2 as const, ...clockSet(0, true, 5_000_000) };
+    const clock = matchClock(second, 15, 5_000_000 + 61_000);
+    expect(clock.label).toBe('16:01');
+    expect(clock.minute).toBe(17);
+  });
+
+  it('ajuste manual e leitura de mm:ss', () => {
+    expect(parseClock('12:30')).toBe(750_000);
+    expect(parseClock('7')).toBe(420_000);
+    expect(parseClock('abc')).toBeNull();
+    const set = { ...base, ...clockSet(750_000, false, 3_000_000) };
+    expect(matchClock(set, 15, 4_000_000).label).toBe('12:30');
+  });
+
+  it('jogos antigos sem os campos novos continuam funcionando', () => {
+    const legacy = { status: 'live' as const, period: 1 as const, clockStartedAt: 1_000_000 };
+    expect(matchMinute(legacy, 15, 1_000_000 + 30_000)).toBe(1);
+    expect(matchMinute({ ...legacy, status: 'halftime' }, 15, 2_000_000)).toBeNull();
   });
 });

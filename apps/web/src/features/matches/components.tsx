@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { STAGE_LABEL, describeSlot, isPredictionOpen, matchMinute, type Match, type MatchEvent } from '@copa/shared';
+import { STAGE_LABEL, describeSlot, isPredictionOpen, matchClock, type Match, type MatchEvent } from '@copa/shared';
 import { useNow } from '@/shared/lib/data';
 import { Badge, LiveDot, TeamCrest } from '@/shared/ui';
 import { cn, formatCountdown, formatTime } from '@/shared/utils/format';
@@ -10,17 +10,18 @@ export function useMatchClock(match: Match | null) {
   const now = useNow(5000);
   if (!match) return null;
   const half = Math.round((tournament?.format.matchDurationMin ?? 30) / 2);
-  return matchMinute(match, half, now);
+  return match.status === 'live' ? matchClock(match, half, now) : null;
 }
 
 export function StatusBadge({ match }: { match: Match }) {
-  const minute = useMatchClock(match);
+  const clock = useMatchClock(match);
   const now = useNow(30000);
+  if (match.status === 'live' && clock && !clock.running) return <Badge tone="yellow">⏸ Pausado · {clock.minute}'</Badge>;
   if (match.status === 'live')
     return (
       <Badge tone="red">
         <LiveDot />
-        {minute ? `${minute}'` : 'Ao vivo'}
+        {clock ? `${clock.minute}'` : 'Ao vivo'}
       </Badge>
     );
   if (match.status === 'halftime') return <Badge tone="yellow">Intervalo</Badge>;

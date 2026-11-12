@@ -138,6 +138,8 @@ async function main() {
       status: 'scheduled',
       period: 1,
       clockStartedAt: null,
+      clockElapsedMs: 0,
+      clockRunning: false,
       score: { home: 0, away: 0 },
       penalties: null,
       finishedAt: null,

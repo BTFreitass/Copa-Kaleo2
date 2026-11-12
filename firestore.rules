@@ -46,7 +46,7 @@ service cloud.firestore {
       allow read: if true;
       allow create, delete: if isAdmin();
       allow update: if isAdmin() || (isMesario()
-        && changed().hasOnly(['status', 'period', 'clockStartedAt', 'score', 'penalties', 'finishedAt', 'kickoffAt']));
+        && changed().hasOnly(['status', 'period', 'clockStartedAt', 'clockElapsedMs', 'clockRunning', 'score', 'penalties', 'finishedAt', 'kickoffAt']));
 
       match /events/{eid} {
         allow read: if true;

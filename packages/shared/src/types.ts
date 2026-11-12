@@ -130,6 +130,8 @@ export interface Match {
   status: MatchStatus;
   period: 1 | 2;
   clockStartedAt: Millis | null;
+  clockElapsedMs?: number;
+  clockRunning?: boolean;
   score: Score;
   penalties: Score | null;
   finishedAt: Millis | null;

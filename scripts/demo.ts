@@ -64,7 +64,7 @@ async function main() {
   };
 
   const startMatch = async (m: Match) => {
-    await db.doc(`matches/${m.id}`).update({ status: 'live', clockStartedAt: Date.now(), period: 1 });
+    await db.doc(`matches/${m.id}`).update({ status: 'live', clockStartedAt: Date.now(), clockElapsedMs: 0, clockRunning: true, period: 1 });
     const { token: qr } = await call<{ token: string }>('rotateCheckinToken', { matchId: m.id }, mesario);
     for (const p of people.slice(0, 3 + Math.floor(random() * 9))) await call('checkIn', { matchId: m.id, token: qr }, await token(p.email));
   };
