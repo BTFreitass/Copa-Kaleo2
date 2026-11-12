@@ -6,7 +6,7 @@
 > Humanos: leiam antes de pegar uma tarefa, para não fazer em dobro.
 > **Nunca escreva senhas, chaves secretas ou tokens neste arquivo.**
 
-**Última atualização:** 2026-11-11 · Bruno (com Claude)
+**Última atualização:** 2026-11-12 · Bruno (com Claude)
 **Branch de trabalho:** `hmg` · **Produção:** `main` (site antigo ainda no ar)
 
 ---
@@ -19,7 +19,7 @@
 | Tipagem / build | `npm run typecheck` e `npm run build` passam |
 | Testes de domínio | `npm test`: 12/12 passando |
 | Simulação ponta a ponta | `npm run simulate`: 27/27 verificações passando (regras de segurança, bolão, mata-mata, figurinhas, cupons, medalhas, Hall da Fama) |
-| Testado no navegador | **Ainda não.** Ninguém clicou pelas telas com os emuladores rodando |
+| Testado no navegador | Teste automático (Chrome headless) em todas as telas públicas, do torcedor, admin, mesário e telão: carregam sem erro após as correções de 2026-11-12. Falta alguém clicar nos fluxos à mão |
 | Site oficial (`main`) | Site antigo (`public/index.html`). PR #2 mesclado (deploy automático consertado). **O deploy do merge está na fila do GitHub Actions há mais de 2 h**; enquanto não rodar, o site no ar continua com a versão anterior |
 | Homologação (`hmg`) | Site novo publicado em https://copakaleo--hmg-rkmyzien.web.app (abre vazio: produção ainda sem dados e sem Functions) |
 | Firestore (produção) | Existe, em `southamerica-east1`. Regras e índices publicados. Ainda sem dados |
@@ -41,6 +41,7 @@
 
 ## Problemas conhecidos
 
+- **Regras do Firestore em produção ainda com o erro de leitura** de palpites/check-ins inexistentes (corrigido em `firestore.rules`, falta publicar: `firebase deploy --only firestore:rules`).
 - **Conflito previsto:** quando a `hmg` for juntada na `main`, os arquivos `.github/workflows/*.yml` vão dar conflito (a `main` recebeu uma versão simplificada no PR #2). Resolver ficando com a versão da `hmg`.
 - O "Craque do Jogo" só aparece depois que o primeiro voto chega (a tela pode explicar melhor).
 - Notificações push (F23) não funcionam nos emuladores. Só dá para testar publicado.
@@ -91,6 +92,8 @@ Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou,
 - Os deploys desses merges ficaram mais de 2 h na fila do GitHub Actions sem começar. O site no ar ainda não recebeu a senha nova. Primeiro item dos "Próximos passos".
 - Regra nova no `CLAUDE.md`: antes de **qualquer** alteração (não só no início da sessão), rodar `git fetch` e conferir se chegou commit novo. Se chegou, parar, avisar, trazer e reler este arquivo. Também no `docs/COLABORACAO.md` (regra 5).
 - URL de clone no tutorial corrigida para `BTFreitass/Copa-Kaleo2`.
+- **Bug grave corrigido: o site inteiro travava em loop infinito de renderização** ("Maximum update depth exceeded") e a maioria das páginas abria vazia. Causa: `converter()` em `apps/web/src/shared/lib/data.ts` criava um conversor novo a cada chamada, então `refEqual`/`queryEqual` nunca davam iguais e os hooks reabriam a escuta sem parar. Agora o conversor é único.
+- Corrigidas as regras de leitura de `predictions`, `longTermPredictions` e `checkins`: ler um documento que ainda não existe (ex.: palpite em jogo sem palpite) dava permissão negada. Agora o `get` confere o ID (`<id>_<uid>`).
 - Novo `npm run demo` (`scripts/demo.ts`): depois do `npm run seed`, deixa o torneio no meio do dia nos emuladores. São 6 jogos encerrados com gols, cartões, check-ins e craque, 1 jogo ao vivo, palpites, a liga "Galera da Igreja", o mural e pacotes abertos. Só mexe nos emuladores, nunca em produção.
 
 ### 2026-11-11 (noite) · Bruno

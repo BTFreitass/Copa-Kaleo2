@@ -13,14 +13,16 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 
+const sharedConverter: FirestoreDataConverter<{ id: string }, DocumentData> = {
+  toFirestore: (value) => {
+    const { id: _id, ...rest } = value as { id: string };
+    return rest as DocumentData;
+  },
+  fromFirestore: (snap: QueryDocumentSnapshot) => ({ ...snap.data(), id: snap.id }),
+};
+
 export function converter<T extends { id: string }>(): FirestoreDataConverter<T, DocumentData> {
-  return {
-    toFirestore: (value) => {
-      const { id: _id, ...rest } = value as T;
-      return rest as DocumentData;
-    },
-    fromFirestore: (snap: QueryDocumentSnapshot) => ({ ...(snap.data() as Omit<T, 'id'>), id: snap.id }) as T,
-  };
+  return sharedConverter as unknown as FirestoreDataConverter<T, DocumentData>;
 }
 
 export const col = <T extends { id: string }>(path: string) => collection(db, path).withConverter(converter<T>());

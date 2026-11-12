@@ -11,6 +11,7 @@ service cloud.firestore {
     function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
     function matchDoc(id) { return get(/databases/$(database)/documents/matches/$(id)).data; }
     function tournamentDoc(id) { return get(/databases/$(database)/documents/tournaments/$(id)).data; }
+    function ownsId(id) { return signedIn() && id.matches('.+_' + request.auth.uid); }
     function validGoals(n) { return n is int && n >= 0 && n <= 30; }
 
     match /settings/{id} {
@@ -84,7 +85,8 @@ service cloud.firestore {
           && d.displayName is string && d.displayName.size() <= 60
           && onlyKeys(['tournamentId', 'matchId', 'uid', 'displayName', 'stage', 'home', 'away', 'isJoker', 'createdAt', 'updatedAt', 'points']);
       }
-      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow get: if ownsId(pid) || isAdmin();
+      allow list: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow create: if signedIn() && validPrediction() && request.resource.data.points == null;
       allow update: if signedIn() && resource.data.uid == request.auth.uid && validPrediction()
         && request.resource.data.points == resource.data.points;
@@ -99,7 +101,8 @@ service cloud.firestore {
           && (t.firstKickoffAt == null || now() < t.firstKickoffAt)
           && onlyKeys(['tournamentId', 'uid', 'championTeamId', 'topScorerPlayerId', 'revelationTeamId', 'points']);
       }
-      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow get: if ownsId(pid) || isAdmin();
+      allow list: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
       allow create: if signedIn() && validLongTerm() && request.resource.data.points == null;
       allow update: if signedIn() && resource.data.uid == request.auth.uid && validLongTerm()
         && request.resource.data.points == resource.data.points;
@@ -134,7 +137,8 @@ service cloud.firestore {
     }
 
     match /checkins/{id} {
-      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow get: if ownsId(id) || isAdmin();
+      allow list: if signedIn() && resource.data.uid == request.auth.uid;
       allow write: if false;
     }
 
