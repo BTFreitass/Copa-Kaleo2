@@ -21,7 +21,7 @@
 | Simulação ponta a ponta | `npm run simulate`: 27/27 verificações passando (regras de segurança, bolão, mata-mata, figurinhas, cupons, medalhas, Hall da Fama) |
 | Testado no navegador | Teste automático (Chrome headless) em todas as telas públicas, do torcedor, admin, mesário e telão: carregam sem erro após as correções de 2026-11-12. Falta alguém clicar nos fluxos à mão |
 | Site oficial (`main`) | Site antigo (`public/index.html`). PR #2 mesclado (deploy automático consertado). **O deploy do merge está na fila do GitHub Actions há mais de 2 h**; enquanto não rodar, o site no ar continua com a versão anterior |
-| Homologação (`hmg`) | Site novo publicado em https://copakaleo--hmg-rkmyzien.web.app (abre vazio: produção ainda sem dados e sem Functions) |
+| Homologação (`hmg`) | Atualizada em 2026-11-12 com tudo do PR #3 (cores novas, modo claro/escuro, cronômetro do mesário, correções). https://copakaleo--hmg-rkmyzien.web.app abre vazio: produção ainda sem dados e sem Functions |
 | Firestore (produção) | Existe, em `southamerica-east1`. Regras e índices publicados. Ainda sem dados |
 | Realtime Database | Regras publicadas. Tudo fechado, exceto `transmissao/videoAtual` (escrita aberta, só texto até 40 caracteres) para o painel do site antigo continuar trocando o vídeo |
 | Storage | Ativado em `us-east1` (cota gratuita; região não pode mudar). Regras publicadas |
@@ -31,13 +31,14 @@
 
 ## Próximos passos (em ordem)
 
-1. **Destravar os deploys na fila** do GitHub Actions (`main` e `hmg`, na fila desde 2026-11-11 20:22 UTC). Ver a aba Actions do repositório; se não andarem, cancelar e rodar de novo (`gh run rerun <id> --repo BTFreitass/Copa-Kaleo2`). Depois, conferir que https://copakaleo.web.app tem a senha nova.
-2. Seu amigo abre o Claude dele e pede: "Lê o STATUS.md e me diz onde paramos".
-3. **Publicar as Functions:** `firebase.cmd deploy --only functions` (no PowerShell, use `firebase.cmd` em vez de `firebase`).
-4. **Teste manual no navegador** com `npm run emulators` + `npm run seed` + `npm run dev`. Passar por cada tela com as contas de demonstração e anotar os problemas em "Problemas conhecidos".
-5. Ativar os métodos de login no console (Google, e-mail/senha com link, telefone, anônimo; Facebook depois).
-6. Quando o site novo substituir o antigo: remover a exceção de `transmissao/videoAtual` em `database.rules.json` e publicar com `firebase deploy --only database`.
-7. Reduzir o pacote do Firebase no site (hoje ~256 KB comprimido).
+1. **Destravar o deploy da `main` na fila** (execução 43095621241, presa desde 2026-11-11 20:22 UTC). Publica o site oficial com a senha nova do painel: cancelar e rodar de novo na aba Actions **só com autorização do Bruno**. Depois, conferir que https://copakaleo.web.app tem a senha nova.
+2. **Publicar as regras do Firestore** (`firebase.cmd deploy --only firestore:rules`): sem isso, o cronômetro do mesário e a correção do bolão não funcionam em produção.
+3. Seu amigo abre o Claude dele e pede: "Lê o STATUS.md e me diz onde paramos".
+4. **Publicar as Functions:** `firebase.cmd deploy --only functions` (no PowerShell, use `firebase.cmd` em vez de `firebase`).
+5. **Teste manual no navegador** com `npm run emulators` + `npm run seed` + `npm run dev`. Passar por cada tela com as contas de demonstração e anotar os problemas em "Problemas conhecidos".
+6. Ativar os métodos de login no console (Google, e-mail/senha com link, telefone, anônimo; Facebook depois).
+7. Quando o site novo substituir o antigo: remover a exceção de `transmissao/videoAtual` em `database.rules.json` e publicar com `firebase deploy --only database`.
+8. Reduzir o pacote do Firebase no site (hoje ~256 KB comprimido).
 
 ## Problemas conhecidos
 
@@ -60,9 +61,9 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | PR | De → Para | O que faz | Situação |
 |---|---|---|---|
-| [#3](https://github.com/BTFreitass/Copa-Kaleo2/pull/3) | `docs/status-pos-merge` → `hmg` | Regra "conferir o Git antes de alterar qualquer coisa" e STATUS pós-merge | Aberto |
+| — | — | — | — |
 
-Já mesclados (2026-11-11, por Bruno (Claude)): #1 `chore/deploy-firestore` → `hmg` e #2 `hotfix/senha-site-antigo` → `main`.
+Já mesclados: #1 `chore/deploy-firestore` → `hmg` e #2 `hotfix/senha-site-antigo` → `main` (2026-11-11, Bruno (Claude)); #3 `docs/status-pos-merge` → `hmg` (2026-11-12, Bruno), com as cores novas, o modo claro/escuro, o cronômetro e o tempo de jogo do mesário, o MySQL e as correções do site.
 
 ---
 
@@ -72,6 +73,8 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 
 | Data | Quem | O que mudou | Como desfazer |
 |---|---|---|---|
+| 2026-11-12 | Bruno (Claude) | Conta do Bruno no Firebase Auth real recebeu o papel de admin (custom claim `admin: true`), para usar o painel na homologação. Feito com a sessão do Firebase CLI, pela API do Identity Toolkit (`accounts:update`) | No painel, em "Usuários e papéis", tirar o admin (precisa das Functions publicadas), ou rodar de novo a mesma chamada sem o `admin` |
+| 2026-11-12 | Bruno | PR #3 mesclado na `hmg`; deploy de homologação concluído (execução 43277623204) | `git revert -m 1 bafec80` numa branch, PR para a `hmg` |
 | 2026-11-11 | Bruno (Claude) | PR #2 mesclado na `main`: senha nova (hash) do site antigo, Copa Fácil, patrocinadores 43–51 e conserto do deploy. Deploy ainda na fila do GitHub | `git revert -m 1 1f01018` numa branch, PR para a `main` |
 | 2026-11-11 | Bruno (Claude) | PR #1 mesclado na `hmg` (deploy de homologação na fila) | `git revert -m 1 8de39cf` numa branch, PR para a `hmg` |
 | 2026-11-11 | Bruno (Claude) | Regras do Realtime Database publicadas: banco fechado, só `transmissao/videoAtual` aberto | Editar `database.rules.json` e `firebase deploy --only database` |
@@ -87,6 +90,9 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 
 Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou, o que ficou pela metade, o que o próximo precisa saber.
 
+### 2026-11-12 (noite) · Bruno (Claude)
+- Painel em branco na homologação (Torneio vazio): o código da hmg ainda é o antigo, sem edição a página não desenha nada. O PR #4 resolve; agora a tela "Criar a edição do torneio" aparece também quando `activeTournamentId` aponta para uma edição que não existe.
+
 ### 2026-11-11 (fim da noite) · Bruno
 - PRs #1 (→ `hmg`) e #2 (→ `main`) mesclados pelo Claude, a pedido do Bruno.
 - Os deploys desses merges ficaram mais de 2 h na fila do GitHub Actions sem começar. O site no ar ainda não recebeu a senha nova. Primeiro item dos "Próximos passos".
@@ -95,6 +101,7 @@ Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou,
 - **Bug grave corrigido: o site inteiro travava em loop infinito de renderização** ("Maximum update depth exceeded") e a maioria das páginas abria vazia. Causa: `converter()` em `apps/web/src/shared/lib/data.ts` criava um conversor novo a cada chamada, então `refEqual`/`queryEqual` nunca davam iguais e os hooks reabriam a escuta sem parar. Agora o conversor é único.
 - Corrigidas as regras de leitura de `predictions`, `longTermPredictions` e `checkins`: ler um documento que ainda não existe (ex.: palpite em jogo sem palpite) dava permissão negada. Agora o `get` confere o ID (`<id>_<uid>`).
 - **Cópia em MySQL para o Workbench:** `sql/schema.sql` (14 tabelas com chaves estrangeiras e as views `v_jogos`, `v_classificacao`, `v_artilharia` e `v_ranking_bolao`) e `npm run mysql:sync`, que recria o banco `copa_kaleo` e copia os dados do Firestore. Por padrão lê os emuladores; com `-- --prod` lê o Firebase real (precisa de `gcloud auth application-default login`). A senha do MySQL fica no `.env`, fora do Git. Testado com o MySQL do XAMPP (MariaDB 10.11, `root` sem senha, que é o padrão do script): 14 tabelas copiadas e views conferidas com o site. O MySQL Workbench novo (26.x) **não conecta no MariaDB** (erro `explain_json_format_version`). Por isso o Bruno instalou o MySQL 8.4 oficial na **porta 3307**, ao lado do XAMPP, com o serviço `MySQL84`. A porta e a senha ficam no `.env`. Cópia testada lá também, com os acentos conferidos.
+- **Criar edição pelo painel (F25):** sem edição ativa (caso do Firebase real, ainda vazio), o painel mostra "Criar a edição do torneio", com nome, ano, nº da edição, data e horário do primeiro jogo, já no padrão futsal 2×20 + 10. A tela cria `tournaments/{ano}` e aponta `settings/site.activeTournamentId`. Antes, cadastrar time sem edição gravava com `tournamentId` vazio e o time nunca aparecia na lista (relato do Bruno na homologação). Regra em `packages/shared/src/edition.ts` (`newEdition`, `validateEdition`), com 21/21 testes. Testado no local, simulando o banco vazio: criou a edição e o time apareceu na lista em 10 ms.
 - **Tempo de jogo configurável (padrão futsal 2×20):** novo quadro "Tempo de jogo" em Painel → Torneio, com cada tempo (padrão 20 min, botão 2×20), intervalo da partida (10 ou 15 com um toque, ou valor livre) e tempo entre um jogo e outro (o antigo campo "Intervalo" do montador, que era isso). Os valores ficam em `format.halfDurationMin` e `format.halftimeMin`, lidos por `matchTiming()`; torneios sem esses campos usam 2×20 + 10. O cronograma do dia agora soma o intervalo da partida (antes ignorava). No intervalo, o mesário vê a contagem regressiva e o site mostra "Intervalo · volta em X min" (campo novo `halftimeStartedAt`). 19/19 testes. O seed e o torneio local já estão em 2×20 + 10.
 - **Cronômetro do mesário (F17):** o mesário controla o relógio com Iniciar 1º tempo, Pausar/Retomar, Reiniciar o período, Ajustar (digitando min:seg ou com ±10 s/±1 min), Intervalo, Iniciar 2º tempo e Encerrar. O seletor 1º tempo / Intervalo / 2º tempo serve para corrigir um toque errado. O jogo ganhou os campos `clockElapsedMs` e `clockRunning`, e a conta fica em `matchClock()` no `packages/shared`, com 4 testes novos (16/16). Jogos antigos sem os campos continuam funcionando. O site mostra "⏸ Pausado" quando o relógio está parado. Testado de ponta a ponta no navegador.
 - Menu do topo sem barra de rolagem: o botão "Painel" saiu do topo (continua no menu do avatar e no menu ☰) e os links ficaram mais próximos. Cabe a partir de 1280 px mesmo logado; abaixo disso vira o menu ☰.
