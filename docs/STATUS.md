@@ -55,7 +55,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| — | — | — | — |
+| Bruno (Claude) | F17: jogo encerrado só aceita gol/cartão/desfazer/reabrir com justificativa | feat/F17-travar-jogo-encerrado | 2026-11-13 |
 
 ## Pull Requests abertos
 
