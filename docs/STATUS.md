@@ -55,7 +55,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| — | — | — | — |
+| Bruno (Claude) | F25 · Criar a primeira edição pelo painel (times não apareciam na homologação) | `docs/status-pos-pr3` (PR #4) | 2026-11-12 |
 
 ## Pull Requests abertos
 
