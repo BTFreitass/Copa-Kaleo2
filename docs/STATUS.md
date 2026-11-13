@@ -73,6 +73,7 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 
 | Data | Quem | O que mudou | Como desfazer |
 |---|---|---|---|
+| 2026-11-12 | Bruno (Claude) | Conta do Bruno no Firebase Auth real recebeu o papel de admin (custom claim `admin: true`), para usar o painel na homologação. Feito com a sessão do Firebase CLI, pela API do Identity Toolkit (`accounts:update`) | No painel, em "Usuários e papéis", tirar o admin (precisa das Functions publicadas), ou rodar de novo a mesma chamada sem o `admin` |
 | 2026-11-12 | Bruno | PR #3 mesclado na `hmg`; deploy de homologação concluído (execução 43277623204) | `git revert -m 1 bafec80` numa branch, PR para a `hmg` |
 | 2026-11-11 | Bruno (Claude) | PR #2 mesclado na `main`: senha nova (hash) do site antigo, Copa Fácil, patrocinadores 43–51 e conserto do deploy. Deploy ainda na fila do GitHub | `git revert -m 1 1f01018` numa branch, PR para a `main` |
 | 2026-11-11 | Bruno (Claude) | PR #1 mesclado na `hmg` (deploy de homologação na fila) | `git revert -m 1 8de39cf` numa branch, PR para a `hmg` |
