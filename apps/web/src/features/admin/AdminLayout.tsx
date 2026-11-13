@@ -1,8 +1,12 @@
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet, useLocation } from 'react-router';
 import { ClipboardCheck, Cog, Film, Gauge, MessagesSquare, Newspaper, Shield, Ticket, Trophy, Users, Wrench, CalendarRange } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
+import { useTournament } from '@/features/tournament/TournamentProvider';
+import { CreateEdition } from './CreateEdition';
 import { EmptyState, PageLoader } from '@/shared/ui';
 import { cn } from '@/shared/utils/format';
+
+const WITHOUT_EDITION = ['/admin/usuarios', '/admin/config'];
 
 const LINKS = [
   { to: '/admin', label: 'Visão geral', icon: Gauge, end: true, admin: true },
@@ -20,7 +24,9 @@ const LINKS = [
 
 export function AdminLayout() {
   const { isAdmin, isMesario, loading } = useAuth();
-  if (loading) return <PageLoader />;
+  const { tournamentId, loading: tournamentLoading } = useTournament();
+  const { pathname } = useLocation();
+  if (loading || tournamentLoading) return <PageLoader />;
   if (!isMesario) return <EmptyState icon={<Shield />} title="Área restrita" description="Entre com uma conta de administrador ou mesário." />;
   const links = LINKS.filter((l) => isAdmin || !l.admin);
 
@@ -41,7 +47,13 @@ export function AdminLayout() {
         ))}
       </aside>
       <div className="min-w-0">
-        <Outlet />
+        {tournamentId || WITHOUT_EDITION.includes(pathname) ? (
+          <Outlet />
+        ) : isAdmin ? (
+          <CreateEdition />
+        ) : (
+          <EmptyState title="Nenhuma edição ativa" description="Peça a um administrador para criar a edição do torneio." />
+        )}
       </div>
     </div>
   );

@@ -7,3 +7,4 @@ export * from './tournamentBuilder';
 export * from './bracket';
 export * from './gamification';
 export * from './utils';
+export * from './edition';

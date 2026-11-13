@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  editionId,
+  newEdition,
+  validateEdition,
   matchTiming,
   clockPause,
   clockResume,
@@ -226,5 +229,23 @@ describe('tempo de jogo', () => {
 
   it('torneios antigos só com a duração total continuam funcionando', () => {
     expect(matchTiming({ matchDurationMin: 30 }).halfMin).toBe(15);
+  });
+});
+
+describe('nova edição', () => {
+  const input = { name: ' Copa Kaleo 2027 ', season: 2027, edition: 5, eventDate: '2027-04-17', dayStartsAt: '08:00' };
+
+  it('nasce na pré-Copa com o padrão do futsal e as regras padrão', () => {
+    const t = newEdition(input);
+    expect(t.name).toBe('Copa Kaleo 2027');
+    expect(t.phase).toBe('pre');
+    expect(matchTiming(t.format)).toEqual({ halfMin: 20, halftimeMin: 10, playMin: 40, matchSlotMin: 50 });
+    expect(editionId(2027)).toBe('2027');
+  });
+
+  it('valida os campos antes de criar', () => {
+    expect(validateEdition(input)).toBeNull();
+    expect(validateEdition({ ...input, name: ' ' })).toMatch(/nome/);
+    expect(validateEdition({ ...input, eventDate: '' })).toMatch(/data/);
   });
 });
