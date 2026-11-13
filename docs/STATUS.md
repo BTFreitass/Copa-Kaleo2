@@ -90,6 +90,9 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 
 Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou, o que ficou pela metade, o que o próximo precisa saber.
 
+### 2026-11-12 (noite) · Bruno (Claude)
+- Painel em branco na homologação (Torneio vazio): o código da hmg ainda é o antigo, sem edição a página não desenha nada. O PR #4 resolve; agora a tela "Criar a edição do torneio" aparece também quando `activeTournamentId` aponta para uma edição que não existe.
+
 ### 2026-11-11 (fim da noite) · Bruno
 - PRs #1 (→ `hmg`) e #2 (→ `main`) mesclados pelo Claude, a pedido do Bruno.
 - Os deploys desses merges ficaram mais de 2 h na fila do GitHub Actions sem começar. O site no ar ainda não recebeu a senha nova. Primeiro item dos "Próximos passos".

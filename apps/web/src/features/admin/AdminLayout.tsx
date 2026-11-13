@@ -24,7 +24,7 @@ const LINKS = [
 
 export function AdminLayout() {
   const { isAdmin, isMesario, loading } = useAuth();
-  const { tournamentId, loading: tournamentLoading } = useTournament();
+  const { tournament, loading: tournamentLoading } = useTournament();
   const { pathname } = useLocation();
   if (loading || tournamentLoading) return <PageLoader />;
   if (!isMesario) return <EmptyState icon={<Shield />} title="Área restrita" description="Entre com uma conta de administrador ou mesário." />;
@@ -47,7 +47,7 @@ export function AdminLayout() {
         ))}
       </aside>
       <div className="min-w-0">
-        {tournamentId || WITHOUT_EDITION.includes(pathname) ? (
+        {tournament || WITHOUT_EDITION.includes(pathname) ? (
           <Outlet />
         ) : isAdmin ? (
           <CreateEdition />
