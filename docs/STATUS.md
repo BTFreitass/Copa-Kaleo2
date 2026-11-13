@@ -61,9 +61,9 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | PR | De → Para | O que faz | Situação |
 |---|---|---|---|
-| — | — | — | — |
+| #5 | `feat/F17-travar-jogo-encerrado` → `hmg` | Jogo encerrado só aceita lance, desfazer ou reabrir com justificativa | Aberto, aguardando merge (Bruno) |
 
-Já mesclados: #1 `chore/deploy-firestore` → `hmg` e #2 `hotfix/senha-site-antigo` → `main` (2026-11-11, Bruno (Claude)); #3 `docs/status-pos-merge` → `hmg` (2026-11-12, Bruno), com as cores novas, o modo claro/escuro, o cronômetro e o tempo de jogo do mesário, o MySQL e as correções do site.
+Já mesclados: #1 `chore/deploy-firestore` → `hmg` e #2 `hotfix/senha-site-antigo` → `main` (2026-11-11, Bruno (Claude)); #3 `docs/status-pos-merge` → `hmg` (2026-11-12, Bruno), com as cores novas, o modo claro/escuro, o cronômetro e o tempo de jogo do mesário, o MySQL e as correções do site; #4 `docs/status-pos-pr3` → `hmg` (2026-11-13, Bruno), com a criação da edição pelo painel.
 
 ---
 
