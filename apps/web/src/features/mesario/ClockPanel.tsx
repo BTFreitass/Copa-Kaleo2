@@ -20,7 +20,7 @@ function phaseOf(match: Match): Phase | null {
   return null;
 }
 
-export function ClockPanel({ match, half, halftimeMin, update, onFinish }: { match: Match; half: number; halftimeMin: number; update: (patch: Partial<Match>) => void; onFinish: () => void }) {
+export function ClockPanel({ match, half, halftimeMin, update, onFinish, onReopen }: { match: Match; half: number; halftimeMin: number; update: (patch: Partial<Match>) => void; onFinish: () => void; onReopen: () => void }) {
   const now = useNow(500);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [editing, setEditing] = useState(false);
@@ -56,7 +56,7 @@ export function ClockPanel({ match, half, halftimeMin, update, onFinish }: { mat
 
   if (match.status === 'finished')
     return (
-      <Button size="lg" variant="secondary" onClick={() => update({ status: 'live', finishedAt: null, ...clockPause(match, Date.now()) })}>
+      <Button size="lg" variant="secondary" onClick={onReopen}>
         Reabrir jogo (correção)
       </Button>
     );

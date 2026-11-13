@@ -154,6 +154,7 @@ export function Timeline({ match, events }: { match: Match; events: MatchEvent[]
             <div className="flex-1">
               <p className="text-sm font-semibold text-white">{eventLabel(e)}</p>
               {e.text && e.type !== 'note' && <p className="text-xs text-gray-400">{e.text}</p>}
+              {e.correction && <p className="text-xs font-semibold text-yellow-300">Lançado depois do fim do jogo</p>}
             </div>
             {team && <TeamCrest team={team} size="xs" />}
           </li>

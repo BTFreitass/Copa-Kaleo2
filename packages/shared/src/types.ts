@@ -142,7 +142,18 @@ export interface Match {
   mvpTally?: Record<string, number>;
   mvp?: { playerId: string; playerName: string };
   crowdStats?: CrowdStats;
+  lastCorrection?: Correction;
 }
+
+export interface Correction {
+  reason: string;
+  by: string;
+  byName: string;
+  at: Millis;
+  action: CorrectionAction;
+}
+
+export type CorrectionAction = 'add' | 'undo' | 'reopen';
 
 export type MatchEventType = 'goal' | 'own_goal' | 'penalty_goal' | 'yellow' | 'red' | 'sub' | 'note';
 
@@ -160,6 +171,8 @@ export interface MatchEvent {
   createdBy: string;
   createdAt: Millis;
   voided: boolean;
+  correction?: Correction;
+  undoCorrection?: Correction;
 }
 
 export interface Prediction {

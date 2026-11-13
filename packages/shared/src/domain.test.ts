@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   editionId,
+  correctionError,
+  needsCorrection,
   newEdition,
   validateEdition,
   matchTiming,
@@ -247,5 +249,20 @@ describe('nova edição', () => {
     expect(validateEdition(input)).toBeNull();
     expect(validateEdition({ ...input, name: ' ' })).toMatch(/nome/);
     expect(validateEdition({ ...input, eventDate: '' })).toMatch(/data/);
+  });
+});
+
+describe('correção de jogo encerrado', () => {
+  it('só exige justificativa depois de encerrado', () => {
+    expect(needsCorrection({ status: 'live' })).toBe(false);
+    expect(needsCorrection({ status: 'halftime' })).toBe(false);
+    expect(needsCorrection({ status: 'finished' })).toBe(true);
+  });
+
+  it('recusa justificativa curta, vazia ou longa demais', () => {
+    expect(correctionError('')).not.toBeNull();
+    expect(correctionError('   gol    ')).not.toBeNull();
+    expect(correctionError('x'.repeat(301))).not.toBeNull();
+    expect(correctionError('Súmula do árbitro: gol aos 18 não lançado')).toBeNull();
   });
 });

@@ -6,7 +6,7 @@
 > Humanos: leiam antes de pegar uma tarefa, para não fazer em dobro.
 > **Nunca escreva senhas, chaves secretas ou tokens neste arquivo.**
 
-**Última atualização:** 2026-11-12 · Bruno (com Claude)
+**Última atualização:** 2026-11-13 · Bruno (com Claude)
 **Branch de trabalho:** `hmg` · **Produção:** `main` (site antigo ainda no ar)
 
 ---
@@ -42,7 +42,7 @@
 
 ## Problemas conhecidos
 
-- **Regras do Firestore em produção desatualizadas:** faltam a correção de leitura de palpites/check-ins inexistentes e a permissão para o mesário gravar `clockElapsedMs`/`clockRunning`/`halftimeStartedAt`. Sem isso, o cronômetro novo não funciona em produção. Já está em `firestore.rules`; falta publicar com `firebase deploy --only firestore:rules`.
+- **Regras do Firestore em produção desatualizadas:** faltam a correção de leitura de palpites/check-ins inexistentes e a permissão para o mesário gravar `clockElapsedMs`/`clockRunning`/`halftimeStartedAt`, além da trava de jogo encerrado (só aceita lance, desfazer ou reabrir com justificativa). Sem isso, o cronômetro novo não funciona em produção e a trava vale só pela tela. Já está em `firestore.rules`; falta publicar com `firebase deploy --only firestore:rules`.
 - **Conflito previsto:** quando a `hmg` for juntada na `main`, os arquivos `.github/workflows/*.yml` vão dar conflito (a `main` recebeu uma versão simplificada no PR #2). Resolver ficando com a versão da `hmg`.
 - O "Craque do Jogo" só aparece depois que o primeiro voto chega (a tela pode explicar melhor).
 - Notificações push (F23) não funcionam nos emuladores. Só dá para testar publicado.
@@ -55,7 +55,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| Bruno (Claude) | F17: jogo encerrado só aceita gol/cartão/desfazer/reabrir com justificativa | feat/F17-travar-jogo-encerrado | 2026-11-13 |
+| — | — | — | — |
 
 ## Pull Requests abertos
 
@@ -89,6 +89,11 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 ## Diário
 
 Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou, o que ficou pela metade, o que o próximo precisa saber.
+
+### 2026-11-13 · Bruno (Claude)
+- PR #4 mesclado na `hmg` (criar a edição pelo painel).
+- F17: depois de encerrado, o jogo só aceita gol, cartão, desfazer lance ou reabrir com **justificativa** (10 a 300 caracteres). Ela fica gravada com nome e horário (`correction`/`undoCorrection` no lance, `lastCorrection` no jogo) e aparece em "Correções depois do fim" no modo mesário. O lance tardio pede tempo e minuto (antes saía com o minuto do relógio corrido, ex.: 1346'). As regras do Firestore também exigem a justificativa. Testado nos emuladores: as 4 tentativas sem justificativa deram 403, e o fluxo de lançar, desfazer e reabrir funcionou pela tela, com o placar atualizando (o bolão é recalculado pelo trigger que já existia quando o placar de um jogo encerrado muda).
+- Admin continua podendo editar o jogo pelo painel sem justificativa (só o lance do mesário é travado).
 
 ### 2026-11-12 (noite) · Bruno (Claude)
 - Painel em branco na homologação (Torneio vazio): o código da hmg ainda é o antigo, sem edição a página não desenha nada. O PR #4 resolve; agora a tela "Criar a edição do torneio" aparece também quando `activeTournamentId` aponta para uma edição que não existe.

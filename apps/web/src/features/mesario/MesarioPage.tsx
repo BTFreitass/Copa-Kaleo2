@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { doc, increment, updateDoc, writeBatch } from 'firebase/firestore';
-import { ArrowLeft, Clock, Undo2, WifiOff } from 'lucide-react';
-import { activeEvents, matchClock, matchTiming, type Match, type MatchEvent, type MatchEventType, type Player } from '@copa/shared';
+import { ArrowLeft, Clock, Lock, Undo2, WifiOff } from 'lucide-react';
+import { activeEvents, clockPause, matchClock, matchTiming, needsCorrection, type Correction, type CorrectionAction, type Match, type MatchEvent, type MatchEventType, type Player } from '@copa/shared';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTournament } from '@/features/tournament/TournamentProvider';
 import { cols, queries, refs } from '@/shared/lib/collections';
@@ -11,14 +11,15 @@ import { db } from '@/shared/lib/firebase';
 import { api, errorMessage } from '@/shared/lib/api';
 import { Button, Card, EmptyState, Field, Input, Modal, PageLoader, TeamCrest, useToast } from '@/shared/ui';
 import { cn } from '@/shared/utils/format';
-import { Timeline, slotName } from '@/features/matches/components';
+import { Timeline, eventLabel, slotName } from '@/features/matches/components';
 import { ClockPanel } from './ClockPanel';
+import { CorrectionModal, type CorrectionRequest } from './CorrectionModal';
 
 type Pending = { type: MatchEventType; side: 'home' | 'away' } | null;
 
 export function MesarioPage() {
   const { id = '' } = useParams();
-  const { isMesario, user } = useAuth();
+  const { isMesario, user, profile } = useAuth();
   const match = useDocument(refs.match(id));
   const events = useCollection(queries.events(id));
   const { players, tournament } = useTournament();
@@ -26,6 +27,7 @@ export function MesarioPage() {
   const toast = useToast();
   const [pending, setPending] = useState<Pending>(null);
   const [penalties, setPenalties] = useState(false);
+  const [justify, setJustify] = useState<CorrectionRequest | null>(null);
   const online = typeof navigator === 'undefined' ? true : navigator.onLine;
 
   const timing = matchTiming(tournament?.format);
@@ -53,14 +55,23 @@ export function MesarioPage() {
     toast('Jogo encerrado! Pontuação do bolão sendo calculada.');
   };
 
-  const register = async (type: MatchEventType, side: 'home' | 'away', player: Player | null, assist: Player | null) => {
+  const locked = needsCorrection(m);
+  const correction = (action: CorrectionAction, reason: string): Correction => ({
+    reason,
+    action,
+    by: user!.uid,
+    byName: (profile?.displayName || user!.displayName || 'Mesário').slice(0, 60),
+    at: Date.now(),
+  });
+
+  const register = async (type: MatchEventType, side: 'home' | 'away', player: Player | null, assist: Player | null, fix?: Correction, at?: { minute: number; period: 1 | 2 }) => {
     const teamId = side === 'home' ? m.homeTeamId! : m.awayTeamId!;
     const scoringSide = type === 'own_goal' ? (side === 'home' ? 'away' : 'home') : side;
     const event: MatchEvent = {
       id: '',
       type,
-      minute,
-      period: m.period,
+      minute: at?.minute ?? minute,
+      period: at?.period ?? m.period,
       teamId,
       playerId: player?.id,
       playerName: player?.name,
@@ -69,28 +80,67 @@ export function MesarioPage() {
       createdBy: user!.uid,
       createdAt: Date.now(),
       voided: false,
+      ...(fix ? { correction: fix } : {}),
     };
+    const isGoal = type === 'goal' || type === 'penalty_goal' || type === 'own_goal';
     const batch = writeBatch(db);
     batch.set(doc(cols.events(m.id)), event);
-    if (type === 'goal' || type === 'penalty_goal' || type === 'own_goal') batch.update(matchRef, { [`score.${scoringSide}`]: increment(1) });
-    batch.commit().catch((e) => toast(errorMessage(e), 'error'));
+    if (isGoal || fix) batch.update(matchRef, { ...(isGoal ? { [`score.${scoringSide}`]: increment(1) } : {}), ...(fix ? { lastCorrection: fix } : {}) });
+    const saved = batch.commit().catch((e) => toast(errorMessage(e), 'error'));
+    if (fix) await saved;
     toast(`${type.includes('goal') ? '⚽ Gol' : type === 'yellow' ? '🟨 Amarelo' : type === 'red' ? '🟥 Vermelho' : 'Evento'} registrado ${minute}'`, 'info');
     setPending(null);
   };
 
-  const undo = async () => {
+  const undo = async (fix?: Correction) => {
     const last = list[list.length - 1];
     if (!last) return;
     const batch = writeBatch(db);
-    batch.update(doc(cols.events(m.id), last.id), { voided: true });
-    if (last.type === 'goal' || last.type === 'penalty_goal' || last.type === 'own_goal') {
-      const side = last.teamId === m.homeTeamId ? 'home' : 'away';
-      const scoringSide = last.type === 'own_goal' ? (side === 'home' ? 'away' : 'home') : side;
-      batch.update(matchRef, { [`score.${scoringSide}`]: increment(-1) });
-    }
+    batch.update(doc(cols.events(m.id), last.id), { voided: true, ...(fix ? { undoCorrection: fix } : {}) });
+    const isGoal = last.type === 'goal' || last.type === 'penalty_goal' || last.type === 'own_goal';
+    const side = last.teamId === m.homeTeamId ? 'home' : 'away';
+    const scoringSide = last.type === 'own_goal' ? (side === 'home' ? 'away' : 'home') : side;
+    if (isGoal || fix) batch.update(matchRef, { ...(isGoal ? { [`score.${scoringSide}`]: increment(-1) } : {}), ...(fix ? { lastCorrection: fix } : {}) });
     await batch.commit().catch((e) => toast(errorMessage(e), 'error'));
     toast('Último lance desfeito', 'info');
   };
+
+  const confirmEvent = (type: MatchEventType, side: 'home' | 'away', player: Player | null, assist: Player | null) => {
+    if (!locked) return register(type, side, player, assist);
+    setPending(null);
+    const what = type.includes('goal') ? 'este gol' : type === 'yellow' ? 'este amarelo' : type === 'red' ? 'este vermelho' : 'este lance';
+    setJustify({
+      title: 'Lançar depois do fim do jogo',
+      description: `O jogo já foi encerrado. Para lançar ${what}${player ? ` (${player.name})` : ''}, explique por quê.`,
+      confirmLabel: 'Lançar com justificativa',
+      askMinute: { minute: Math.min(clock?.minute ?? half, half), period: m.period, max: half },
+      run: (reason, at) => register(type, side, player, assist, correction('add', reason), at),
+    });
+  };
+
+  const askUndo = () => {
+    const last = list[list.length - 1];
+    if (!last) return;
+    if (!locked) return undo();
+    setJustify({
+      title: 'Desfazer lance de jogo encerrado',
+      description: `Você vai desfazer "${eventLabel(last)}" (${last.minute}') de um jogo já encerrado.`,
+      confirmLabel: 'Desfazer com justificativa',
+      run: (reason) => undo(correction('undo', reason)),
+    });
+  };
+
+  const askReopen = () =>
+    setJustify({
+      title: 'Reabrir jogo encerrado',
+      description: 'O jogo volta para "ao vivo" com o cronômetro parado. O bolão é recalculado quando ele for encerrado de novo.',
+      confirmLabel: 'Reabrir com justificativa',
+      run: (reason) => update({ status: 'live', finishedAt: null, ...clockPause(m, Date.now()), lastCorrection: correction('reopen', reason) }),
+    });
+
+  const corrections = events.data
+    .flatMap((e) => [e.correction, e.undoCorrection].filter((c): c is Correction => Boolean(c)).map((fix) => ({ event: e, fix })))
+    .sort((a, b) => b.fix.at - a.fix.at);
 
   const shift = async (minutes: number) => {
     try {
@@ -130,7 +180,14 @@ export function MesarioPage() {
         </div>
       </Card>
 
-      <ClockPanel match={m} half={half} halftimeMin={timing.halftimeMin} update={update} onFinish={finish} />
+      <ClockPanel match={m} half={half} halftimeMin={timing.halftimeMin} update={update} onFinish={finish} onReopen={askReopen} />
+
+      {locked && (
+        <div className="flex gap-3 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-200">
+          <Lock className="size-5 shrink-0" />
+          <p><b>Jogo encerrado.</b> Para lançar gol, cartão ou desfazer um lance agora, é preciso escrever uma justificativa. Ela fica registrada com o seu nome.</p>
+        </div>
+      )}
 
       {m.status !== 'scheduled' && (
         <div className="grid grid-cols-2 gap-3">
@@ -150,7 +207,7 @@ export function MesarioPage() {
         </div>
       )}
 
-      <Button variant="secondary" icon={<Undo2 className="size-4" />} onClick={undo} disabled={list.length === 0}>Desfazer último lance</Button>
+      <Button variant="secondary" icon={<Undo2 className="size-4" />} onClick={askUndo} disabled={list.length === 0}>Desfazer último lance</Button>
 
       <Card className="p-4">
         <p className="mb-2 text-xs font-bold uppercase text-gray-500">Atraso no cronograma</p>
@@ -164,13 +221,37 @@ export function MesarioPage() {
         <Timeline match={m} events={events.data} />
       </Card>
 
-      <PlayerPicker pending={pending} match={m} roster={pending ? roster(pending.type === 'own_goal' ? (pending.side === 'home' ? 'away' : 'home') : pending.side) : []} onClose={() => setPending(null)} onConfirm={(player, assist) => pending && register(pending.type, pending.type === 'own_goal' ? (pending.side === 'home' ? 'away' : 'home') : pending.side, player, assist)} />
+      {(corrections.length > 0 || m.lastCorrection?.action === 'reopen') && (
+        <Card className="p-4">
+          <p className="mb-3 text-xs font-bold uppercase text-gray-500">Correções depois do fim</p>
+          <ul className="flex flex-col gap-2 text-sm">
+            {m.lastCorrection?.action === 'reopen' && <CorrectionItem label="Reabriu o jogo" fix={m.lastCorrection} />}
+            {corrections.map(({ event, fix }) => (
+              <CorrectionItem key={`${event.id}-${fix.action}`} label={`${fix.action === 'undo' ? 'Desfez' : 'Lançou'} ${eventLabel(event)} (${event.period}º tempo, ${event.minute}')`} fix={fix} />
+            ))}
+          </ul>
+        </Card>
+      )}
+
+      <CorrectionModal request={justify} onClose={() => setJustify(null)} />
+
+      <PlayerPicker pending={pending} match={m} roster={pending ? roster(pending.type === 'own_goal' ? (pending.side === 'home' ? 'away' : 'home') : pending.side) : []} onClose={() => setPending(null)} onConfirm={(player, assist) => pending && confirmEvent(pending.type, pending.type === 'own_goal' ? (pending.side === 'home' ? 'away' : 'home') : pending.side, player, assist)} />
 
       <PenaltiesModal open={penalties} match={m} onClose={() => setPenalties(false)} onSave={async (home, away) => {
         await update({ penalties: { home, away }, status: 'finished', finishedAt: Date.now() });
         setPenalties(false);
       }} />
     </div>
+  );
+}
+
+function CorrectionItem({ label, fix }: { label: string; fix: Correction }) {
+  return (
+    <li className="rounded-xl bg-gray-900 p-3">
+      <p className="font-semibold text-white">{label}</p>
+      <p className="text-gray-300">“{fix.reason}”</p>
+      <p className="mt-1 text-xs text-gray-500">{fix.byName} · {new Date(fix.at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</p>
+    </li>
   );
 }
 
