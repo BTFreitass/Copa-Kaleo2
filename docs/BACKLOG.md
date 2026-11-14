@@ -238,6 +238,7 @@ Sprints de 2 semanas a partir de 16/11/2026. As datas são aproximadas e serão 
 
 | Data | Decisão |
 |---|---|
+| 2026-11-13 | F17: jogo encerrado fica travado. Lançar gol/cartão, desfazer lance ou reabrir exige justificativa de 10 a 300 caracteres, gravada com quem fez e quando, e validada também nas regras do Firestore. O bolão recalcula sozinho se o placar mudar (trigger já existente). |
 | 2026-11-12 | F25: cada edição tem o ID do ano (`tournaments/2027`) e é criada pelo painel quando não existe nenhuma ativa. A edição ativa fica em `settings/site.activeTournamentId`; sem ela, o painel só libera Usuários e Transmissão/patrocínio |
 | 2026-11-12 | Tempo de jogo padrão: futsal oficial, 2 × 20 min com intervalo de 10 min (15 como alternativa rápida), editável por edição em Painel → Torneio. O cronograma reserva 2 × tempo + intervalo + tempo entre jogos. Como no futsal o cronômetro para, use o "entre jogos" como folga para o tempo real maior |
 | 2026-11-12 | F17: o relógio da partida é controlado pelo mesário (pausar, retomar, reiniciar e ajustar à mão) e não corre sozinho pelo horário de início. O 2º tempo começa em metade da duração do jogo (ex.: 15:00 num jogo de 30 min). Não há limite de acréscimos: quem decide o fim é o mesário |

@@ -1,5 +1,5 @@
 import type { Match, MatchEvent } from './types';
-import { STAGE_LABEL } from './constants';
+import { CORRECTION_REASON, STAGE_LABEL } from './constants';
 
 export function slugify(value: string) {
   return value
@@ -132,4 +132,15 @@ export function buildMatchReport(match: Match, events: MatchEvent[]) {
       .filter(Boolean)
       .join('\n\n'),
   };
+}
+
+export function needsCorrection(match: Pick<Match, 'status'>) {
+  return match.status === 'finished';
+}
+
+export function correctionError(reason: string) {
+  const text = reason.trim();
+  if (text.length < CORRECTION_REASON.min) return `Explique o motivo com pelo menos ${CORRECTION_REASON.min} caracteres.`;
+  if (text.length > CORRECTION_REASON.max) return `Use no máximo ${CORRECTION_REASON.max} caracteres.`;
+  return null;
 }

@@ -13,6 +13,12 @@ service cloud.firestore {
     function tournamentDoc(id) { return get(/databases/$(database)/documents/tournaments/$(id)).data; }
     function ownsId(id) { return signedIn() && id.matches('.+_' + request.auth.uid); }
     function validGoals(n) { return n is int && n >= 0 && n <= 30; }
+    function validCorrection(c) {
+      return c is map && c.keys().hasOnly(['reason', 'by', 'byName', 'at', 'action'])
+        && c.reason is string && c.reason.trim().size() >= 10 && c.reason.size() <= 300
+        && c.by == request.auth.uid && c.byName is string && c.at is int
+        && c.action in ['add', 'undo', 'reopen'];
+    }
 
     match /settings/{id} {
       allow read: if true;
@@ -46,11 +52,15 @@ service cloud.firestore {
       allow read: if true;
       allow create, delete: if isAdmin();
       allow update: if isAdmin() || (isMesario()
-        && changed().hasOnly(['status', 'period', 'clockStartedAt', 'clockElapsedMs', 'clockRunning', 'halftimeStartedAt', 'score', 'penalties', 'finishedAt', 'kickoffAt']));
+        && changed().hasOnly(['status', 'period', 'clockStartedAt', 'clockElapsedMs', 'clockRunning', 'halftimeStartedAt', 'score', 'penalties', 'finishedAt', 'kickoffAt', 'lastCorrection'])
+        && (resource.data.status != 'finished' || ('lastCorrection' in changed() && validCorrection(request.resource.data.lastCorrection))));
 
       match /events/{eid} {
         allow read: if true;
-        allow create, update: if isMesario();
+        allow create: if isMesario()
+          && (matchDoc(mid).status != 'finished' || validCorrection(request.resource.data.correction));
+        allow update: if isMesario()
+          && (matchDoc(mid).status != 'finished' || ('undoCorrection' in changed() && validCorrection(request.resource.data.undoCorrection)));
         allow delete: if isAdmin();
       }
 

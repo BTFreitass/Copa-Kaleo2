@@ -52,6 +52,8 @@ export const DEFAULT_MEDAL_RULES: MedalRules = {
 
 export const DEFAULT_JOKER_LIMITS = { group: 1, knockout: 1 };
 
+export const CORRECTION_REASON = { min: 10, max: 300 } as const;
+
 export const MVP_VOTING_WINDOW_MS = 10 * 60 * 1000;
 
 export const STAGE_LABEL: Record<Stage, string> = {

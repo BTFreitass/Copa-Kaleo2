@@ -108,7 +108,11 @@ interface MatchEvent {
   text?: string;                             // narração opcional do lance a lance
   createdBy: string; createdAt: Timestamp;
   voided: boolean;                           // "desfazer" sem apagar histórico
+  correction?: Correction;                   // lance lançado depois do jogo encerrado
+  undoCorrection?: Correction;               // lance desfeito depois do jogo encerrado
 }
+// Correction = { reason (10–300), by (uid), byName, at, action: 'add' | 'undo' | 'reopen' }
+// matches/{id}.lastCorrection guarda a última correção (inclusive a reabertura)
 
 // 👤 matches/{matchId}/mvpVotes/{uid}        F03
 interface MvpVote { playerId: string; createdAt: Timestamp }
