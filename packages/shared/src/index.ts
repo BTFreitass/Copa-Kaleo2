@@ -8,3 +8,4 @@ export * from './bracket';
 export * from './gamification';
 export * from './utils';
 export * from './edition';
+export * from './palette';

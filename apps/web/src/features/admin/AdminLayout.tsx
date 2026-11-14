@@ -1,12 +1,12 @@
 import { NavLink, Outlet, useLocation } from 'react-router';
-import { ClipboardCheck, Cog, Film, Gauge, MessagesSquare, Newspaper, Shield, Ticket, Trophy, Users, Wrench, CalendarRange } from 'lucide-react';
+import { ClipboardCheck, Cog, Film, Gauge, MessagesSquare, Newspaper, Palette, Shield, Ticket, Trophy, Users, Wrench, CalendarRange } from 'lucide-react';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { useTournament } from '@/features/tournament/TournamentProvider';
 import { CreateEdition } from './CreateEdition';
 import { EmptyState, PageLoader } from '@/shared/ui';
 import { cn } from '@/shared/utils/format';
 
-const WITHOUT_EDITION = ['/admin/usuarios', '/admin/config'];
+const WITHOUT_EDITION = ['/admin/usuarios', '/admin/config', '/admin/personalizacao'];
 
 const LINKS = [
   { to: '/admin', label: 'Visão geral', icon: Gauge, end: true, admin: true },
@@ -19,6 +19,7 @@ const LINKS = [
   { to: '/admin/mural', label: 'Mural', icon: MessagesSquare, admin: true },
   { to: '/admin/cupons', label: 'Cupons', icon: Ticket, admin: true },
   { to: '/admin/config', label: 'Transmissão e patrocínio', icon: Cog, admin: true },
+  { to: '/admin/personalizacao', label: 'Personalização', icon: Palette, admin: true },
   { to: '/admin/usuarios', label: 'Usuários e papéis', icon: Wrench, admin: true },
 ];
 

@@ -55,7 +55,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| Bruno (Claude) | Esquema de cores "Quadra noturna" + escolha do esquema no painel (Personalização) | `feat/paleta-personalizavel` | 2026-11-14 |
+| — | — | — | — |
 
 ## Pull Requests abertos
 
@@ -89,6 +89,13 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 ## Diário
 
 Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou, o que ficou pela metade, o que o próximo precisa saber.
+
+### 2026-11-14 · Bruno (Claude)
+- Novo esquema de cores **Quadra noturna**, agora o padrão: fundo e cartões em grafite neutro, título "COPA KALEO 2027" em azul/branco/vermelho sólidos e linhas de quadra de futsal no destaque da home. O visual anterior virou o esquema **Clássico**.
+- Nova tela **Admin → Personalização** (só admin, funciona mesmo sem edição criada): clicar num esquema mostra a prévia só para quem está na tela; "Usar no site" grava `settings/site.palette` e todos os visitantes passam a ver.
+- Como funciona: atributo `data-palette` no `<html>` (aplicado já no `index.html` a partir do `localStorage` para não piscar) e regras em `index.css` que redefinem os cinzas. Para criar outro esquema: adicionar em `packages/shared/src/palette.ts`, no mapa de cores de `apps/web/src/shared/lib/palette.ts` e no script do `index.html`, e escrever as regras em `index.css`.
+- Conferido nos emuladores com Chrome headless: home nos modos escuro e claro, Clássico idêntico ao anterior, e prévia na tela do painel.
+- O dourado do esboço (para conquistas) ainda não foi aplicado nos componentes; fica como próxima melhoria, se aprovarem.
 
 ### 2026-11-12 (noite) · Bruno (Claude)
 - Painel em branco na homologação (Torneio vazio): o código da hmg ainda é o antigo, sem edição a página não desenha nada. O PR #4 resolve; agora a tela "Criar a edição do torneio" aparece também quando `activeTournamentId` aponta para uma edição que não existe.

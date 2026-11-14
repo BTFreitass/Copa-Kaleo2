@@ -271,3 +271,32 @@ export function Stat({ label, value, icon }: { label: string; value: ReactNode; 
     </div>
   );
 }
+
+export function BrandName({ name, className }: { name: string; className?: string }) {
+  const words = name.trim().split(/\s+/);
+  const [first, ...rest] = words;
+  const last = rest.length > 1 && /^\d+$/.test(rest[rest.length - 1] ?? '') ? rest.pop() : undefined;
+  const middle = last ? rest.join(' ') : '';
+  const accent = last ?? rest.join(' ');
+  return (
+    <span className={cn('brand-name', className)}>
+      {first}
+      {middle && <> <span className="brand-middle">{middle}</span></>}
+      {accent && <> <span className="brand-accent">{accent}</span></>}
+    </span>
+  );
+}
+
+export function CourtLines() {
+  return (
+    <svg className="hero-court pointer-events-none absolute inset-0 size-full" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <g fill="none" stroke="currentColor" strokeWidth="1.2">
+        <rect x="10" y="10" width="380" height="180" rx="2" />
+        <line x1="200" y1="10" x2="200" y2="190" />
+        <circle cx="200" cy="100" r="30" />
+        <path d="M10 55 a45 45 0 0 1 0 90" />
+        <path d="M390 55 a45 45 0 0 0 0 90" />
+      </g>
+    </svg>
+  );
+}

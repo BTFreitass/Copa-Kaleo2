@@ -5,7 +5,7 @@ import { useAuth } from '@/features/auth/AuthProvider';
 import { queries } from '@/shared/lib/collections';
 import { useCollection } from '@/shared/lib/data';
 import { api } from '@/shared/lib/api';
-import { Avatar, Button } from '@/shared/ui';
+import { Avatar, BrandName, Button } from '@/shared/ui';
 import { Scoreboard, Timeline } from '@/features/matches/components';
 import { CrowdBar } from '@/features/matches/pages';
 import { useSponsors } from '@/features/sponsors/Sponsors';
@@ -61,7 +61,7 @@ export function TelaoPage() {
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-4">
           <img src="/img/Kaleo.jpg" alt="" className="size-16 rounded-2xl" />
-          <span className="text-5xl font-black uppercase tracking-tighter text-gradient">Copa Kaleo</span>
+          <span className="text-5xl font-black uppercase tracking-tighter"><BrandName name="Copa Kaleo" /></span>
         </div>
         {focus && (
           <div className="rounded-[2rem] border border-white/10 bg-black/30 p-10 backdrop-blur">

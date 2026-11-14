@@ -1,9 +1,9 @@
 import { useSyncExternalStore } from 'react';
+import { themeColor } from './palette';
 
 export type Theme = 'light' | 'dark';
 
 const KEY = 'copa:theme';
-const BACKGROUND: Record<Theme, string> = { light: '#f3f6fb', dark: '#070d1c' };
 const listeners = new Set<() => void>();
 
 function systemTheme(): Theme {
@@ -27,7 +27,7 @@ function apply(theme: Theme) {
   const root = document.documentElement;
   root.classList.remove('light', 'dark');
   root.classList.add(theme);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BACKGROUND[theme]);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', themeColor(theme));
   listeners.forEach((listener) => listener());
 }
 
