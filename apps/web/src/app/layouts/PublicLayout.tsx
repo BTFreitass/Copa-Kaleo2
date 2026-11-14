@@ -21,7 +21,7 @@ import {
 import { useAuth } from '@/features/auth/AuthProvider';
 import { authService } from '@/features/auth/authService';
 import { useTournament } from '@/features/tournament/TournamentProvider';
-import { LiveDot } from '@/shared/ui';
+import { BrandName, LiveDot } from '@/shared/ui';
 import { cn } from '@/shared/utils/format';
 import { SponsorsStrip } from '@/features/sponsors/Sponsors';
 import { useFavoriteTheme } from '@/features/gamification/useFavoriteTheme';
@@ -60,7 +60,7 @@ export function PublicLayout() {
             <span className="rounded-xl bg-gradient-brand p-0.5 shadow-lg shadow-blue-500/20">
               <img src="/img/Kaleo.jpg" alt="" className="size-9 rounded-[10px] object-cover" />
             </span>
-            <span className="text-xl font-black uppercase tracking-tighter text-gradient">Copa Kaleo</span>
+            <span className="text-xl font-black uppercase tracking-tighter"><BrandName name="Copa Kaleo" /></span>
           </Link>
 
           <nav className="hidden min-w-0 flex-1 items-center gap-0.5 xl:flex">

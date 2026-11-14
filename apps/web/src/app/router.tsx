@@ -35,6 +35,7 @@ const adminTeams = () => import('@/features/admin/TeamsAdmin');
 const adminMatches = () => import('@/features/admin/MatchesAdmin');
 const adminPosts = () => import('@/features/admin/PostsAdmin');
 const adminMisc = () => import('@/features/admin/MiscAdmin');
+const adminAppearance = () => import('@/features/admin/AppearanceAdmin');
 
 function RouteError() {
   const error = useRouteError() as { status?: number } | undefined;
@@ -99,6 +100,7 @@ export const router = createBrowserRouter([
           { path: 'mural', element: page(adminMisc, 'WallAdmin') },
           { path: 'cupons', element: page(adminMisc, 'CouponsAdmin') },
           { path: 'config', element: page(adminMisc, 'SettingsAdmin') },
+          { path: 'personalizacao', element: page(adminAppearance, 'AppearanceAdmin') },
           { path: 'usuarios', element: page(adminMisc, 'UsersAdmin') },
         ],
       },

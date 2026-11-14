@@ -6,7 +6,7 @@
 > Humanos: leiam antes de pegar uma tarefa, para não fazer em dobro.
 > **Nunca escreva senhas, chaves secretas ou tokens neste arquivo.**
 
-**Última atualização:** 2026-11-13 · Bruno (com Claude)
+**Última atualização:** 2026-11-14 · Bruno (com Claude)
 **Branch de trabalho:** `hmg` · **Produção:** `main` (site antigo ainda no ar)
 
 ---
@@ -61,9 +61,9 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | PR | De → Para | O que faz | Situação |
 |---|---|---|---|
-| #5 | `feat/F17-travar-jogo-encerrado` → `hmg` | Jogo encerrado só aceita lance, desfazer ou reabrir com justificativa | Aberto, aguardando merge (Bruno) |
+| #6 | `feat/paleta-personalizavel` → `hmg` | Esquema de cores Quadra noturna (padrão) e tela Admin → Personalização para trocar o esquema | Aberto, aguardando revisão (Bruno) |
 
-Já mesclados: #1 `chore/deploy-firestore` → `hmg` e #2 `hotfix/senha-site-antigo` → `main` (2026-11-11, Bruno (Claude)); #3 `docs/status-pos-merge` → `hmg` (2026-11-12, Bruno), com as cores novas, o modo claro/escuro, o cronômetro e o tempo de jogo do mesário, o MySQL e as correções do site; #4 `docs/status-pos-pr3` → `hmg` (2026-11-13, Bruno), com a criação da edição pelo painel.
+Já mesclados: #1 `chore/deploy-firestore` → `hmg` e #2 `hotfix/senha-site-antigo` → `main` (2026-11-11, Bruno (Claude)); #3 `docs/status-pos-merge` → `hmg` (2026-11-12, Bruno), com as cores novas, o modo claro/escuro, o cronômetro e o tempo de jogo do mesário, o MySQL e as correções do site; #4 `docs/status-pos-pr3` → `hmg` (2026-11-13, Bruno), com a criação da edição pelo painel; #5 `feat/F17-travar-jogo-encerrado` → `hmg` (2026-11-14, Bruno), com a trava de jogo encerrado.
 
 ---
 
@@ -73,6 +73,7 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 
 | Data | Quem | O que mudou | Como desfazer |
 |---|---|---|---|
+| 2026-11-14 | Bruno | PR #5 mesclado na `hmg` (trava de jogo encerrado); deploy de homologação automático. As regras novas do Firestore ainda não foram publicadas em produção | `git revert -m 1 4a75b78` numa branch, PR para a `hmg` |
 | 2026-11-12 | Bruno (Claude) | Conta do Bruno no Firebase Auth real recebeu o papel de admin (custom claim `admin: true`), para usar o painel na homologação. Feito com a sessão do Firebase CLI, pela API do Identity Toolkit (`accounts:update`) | No painel, em "Usuários e papéis", tirar o admin (precisa das Functions publicadas), ou rodar de novo a mesma chamada sem o `admin` |
 | 2026-11-12 | Bruno | PR #3 mesclado na `hmg`; deploy de homologação concluído (execução 43277623204) | `git revert -m 1 bafec80` numa branch, PR para a `hmg` |
 | 2026-11-11 | Bruno (Claude) | PR #2 mesclado na `main`: senha nova (hash) do site antigo, Copa Fácil, patrocinadores 43–51 e conserto do deploy. Deploy ainda na fila do GitHub | `git revert -m 1 1f01018` numa branch, PR para a `main` |
@@ -89,6 +90,13 @@ Tudo que mexeu no Firebase real (`copakaleo`) ou no site oficial. Uma linha por 
 ## Diário
 
 Uma entrada por sessão de trabalho, a mais recente no topo. Curta: o que mudou, o que ficou pela metade, o que o próximo precisa saber.
+
+### 2026-11-14 · Bruno (Claude)
+- Novo esquema de cores **Quadra noturna**, agora o padrão: fundo e cartões em grafite neutro, título "COPA KALEO 2027" em azul/branco/vermelho sólidos e linhas de quadra de futsal no destaque da home. O visual anterior virou o esquema **Clássico**.
+- Nova tela **Admin → Personalização** (só admin, funciona mesmo sem edição criada): clicar num esquema mostra a prévia só para quem está na tela; "Usar no site" grava `settings/site.palette` e todos os visitantes passam a ver.
+- Como funciona: atributo `data-palette` no `<html>` (aplicado já no `index.html` a partir do `localStorage` para não piscar) e regras em `index.css` que redefinem os cinzas. Para criar outro esquema: adicionar em `packages/shared/src/palette.ts`, no mapa de cores de `apps/web/src/shared/lib/palette.ts` e no script do `index.html`, e escrever as regras em `index.css`.
+- Conferido nos emuladores com Chrome headless: home nos modos escuro e claro, Clássico idêntico ao anterior, e prévia na tela do painel.
+- O dourado do esboço (para conquistas) ainda não foi aplicado nos componentes; fica como próxima melhoria, se aprovarem.
 
 ### 2026-11-13 · Bruno (Claude)
 - PR #4 mesclado na `hmg` (criar a edição pelo painel).

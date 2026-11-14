@@ -1,7 +1,8 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import type { Match, Player, SiteSettings, Team, Tournament } from '@copa/shared';
+import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react';
+import { DEFAULT_PALETTE, type Match, type Player, type SiteSettings, type Team, type Tournament } from '@copa/shared';
 import { refs, queries } from '@/shared/lib/collections';
 import { useCollection, useDocument } from '@/shared/lib/data';
+import { setSitePalette } from '@/shared/lib/palette';
 
 interface TournamentState {
   settings: SiteSettings | null;
@@ -26,6 +27,11 @@ export function TournamentProvider({ children }: { children: ReactNode }) {
   const teams = useCollection(tournamentId ? queries.teams(tournamentId) : null);
   const players = useCollection(tournamentId ? queries.players(tournamentId) : null);
   const matches = useCollection(tournamentId ? queries.matches(tournamentId) : null);
+  const palette = settings.data?.palette ?? DEFAULT_PALETTE;
+
+  useEffect(() => {
+    if (!settings.loading && !settings.error) setSitePalette(palette);
+  }, [settings.loading, settings.error, palette]);
 
   const value = useMemo<TournamentState>(() => {
     const live = matches.data.find((m) => m.status === 'live' || m.status === 'halftime') ?? null;

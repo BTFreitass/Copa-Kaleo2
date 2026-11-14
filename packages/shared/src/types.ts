@@ -455,7 +455,10 @@ export interface SiteSettings {
   activeTournamentId: string;
   liveStream: { active: boolean; platform: 'youtube' | 'twitch'; channelOrVideoId: string };
   sponsors: Sponsor[];
+  palette?: SitePalette;
 }
+
+export type SitePalette = 'quadra' | 'classico';
 
 export interface Registration {
   id: string;

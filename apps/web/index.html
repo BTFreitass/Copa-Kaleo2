@@ -15,8 +15,13 @@
         var saved = null;
         try { saved = localStorage.getItem('copa:theme'); } catch (e) {}
         var theme = saved === 'light' || saved === 'dark' ? saved : window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        var palette = null;
+        try { palette = localStorage.getItem('copa:palette'); } catch (e) {}
+        if (palette !== 'quadra' && palette !== 'classico') palette = 'quadra';
+        var colors = { quadra: { light: '#f6f7f9', dark: '#0e1013' }, classico: { light: '#f3f6fb', dark: '#070d1c' } };
         document.documentElement.classList.add(theme);
-        document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'light' ? '#f3f6fb' : '#070d1c');
+        document.documentElement.setAttribute('data-palette', palette);
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', colors[palette][theme]);
       })();
     </script>
   </head>

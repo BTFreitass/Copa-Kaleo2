@@ -5,7 +5,7 @@ import { useTournament } from '@/features/tournament/TournamentProvider';
 import { useAuth } from '@/features/auth/AuthProvider';
 import { queries } from '@/shared/lib/collections';
 import { useCollection, useNow } from '@/shared/lib/data';
-import { Avatar, Badge, Button, Card, Skeleton } from '@/shared/ui';
+import { Avatar, Badge, BrandName, Button, Card, CourtLines, Skeleton } from '@/shared/ui';
 import { formatCountdown, formatDate, formatFullDate } from '@/shared/utils/format';
 import { MatchCard, Scoreboard } from '@/features/matches/components';
 import { StreamPlayer } from '@/features/live/StreamPlayer';
@@ -26,16 +26,17 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <section className="relative overflow-hidden rounded-3xl border border-gray-800 bg-gradient-to-br from-blue-950 via-purple-950 to-gray-950 p-6 sm:p-10">
-        <div className="absolute -right-24 -top-24 size-80 rounded-full bg-pink-500/20 blur-3xl" />
-        <div className="absolute -bottom-24 -left-24 size-80 rounded-full bg-blue-500/20 blur-3xl" />
+      <section className="hero-surface relative overflow-hidden rounded-3xl border border-gray-800 p-6 sm:p-10">
+        <div className="hero-glow absolute -right-24 -top-24 size-80 rounded-full bg-pink-500/20 blur-3xl" />
+        <div className="hero-glow absolute -bottom-24 -left-24 size-80 rounded-full bg-blue-500/20 blur-3xl" />
+        <CourtLines />
         <div className="relative grid items-center gap-8 lg:grid-cols-[1.2fr_1fr]">
           <div className="flex flex-col gap-4">
             <Badge tone="purple" className="w-fit">
               {phase === 'pre' ? '🔥 Pré-Copa' : phase === 'matchday' ? '⚽ Dia da Copa' : '🏅 Pós-Copa'}
             </Badge>
             <h1 className="text-4xl font-black uppercase leading-none tracking-tighter sm:text-6xl">
-              <span className="text-gradient">{tournament?.name ?? 'Copa Kaleo'}</span>
+              <BrandName name={tournament?.name ?? 'Copa Kaleo'} />
             </h1>
             {tournament?.eventDate && (
               <p className="flex items-center gap-2 text-gray-300">

@@ -563,6 +563,57 @@
   --color-white: #ffffff;
 }
 
+:root[data-palette='quadra'].dark,
+:root[data-palette='quadra'] .dark {
+  --color-gray-50: #f6f7f8;
+  --color-gray-100: #eaecef;
+  --color-gray-200: #d5d9df;
+  --color-gray-300: #b4bac4;
+  --color-gray-400: #8d94a0;
+  --color-gray-500: #646b77;
+  --color-gray-600: #454b55;
+  --color-gray-700: #30353d;
+  --color-gray-800: #24282f;
+  --color-gray-900: #171a1f;
+  --color-gray-950: #0e1013;
+}
+
+:root[data-palette='quadra'].light,
+:root[data-palette='quadra'] .light {
+  --color-gray-50: #0e1116;
+  --color-gray-100: #161a20;
+  --color-gray-200: #22272e;
+  --color-gray-300: #333942;
+  --color-gray-400: #4b525d;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #9aa1ac;
+  --color-gray-700: #cdd1d7;
+  --color-gray-800: #e3e6ea;
+  --color-gray-900: #ffffff;
+  --color-gray-950: #f6f7f9;
+  --color-white: #12151a;
+}
+
+.brand-name { @apply text-gradient; }
+:root[data-palette='quadra'] .brand-name { background: none; color: var(--color-blue-500); }
+:root[data-palette='quadra'] .brand-name .brand-middle { color: var(--color-white); }
+:root[data-palette='quadra'] .brand-name .brand-accent { color: var(--color-red-500); }
+:root[data-palette='quadra'].dark .brand-name { color: oklch(66% 0.18 258); }
+:root[data-palette='quadra'].dark .brand-name .brand-accent { color: oklch(66% 0.22 24); }
+
+.hero-surface { background-image: linear-gradient(to bottom right, var(--color-blue-950), var(--color-purple-950), var(--color-gray-950)); }
+.hero-court { display: none; }
+:root[data-palette='quadra'] .hero-surface {
+  background-color: var(--color-gray-900);
+  background-image: radial-gradient(120% 140% at 0% 0%, color-mix(in oklab, var(--color-blue-600) 22%, transparent), transparent 55%);
+}
+:root[data-palette='quadra'].light .hero-surface {
+  background-image: radial-gradient(120% 140% at 0% 0%, color-mix(in oklab, var(--color-blue-600) 10%, transparent), transparent 55%);
+}
+:root[data-palette='quadra'] .hero-glow { display: none; }
+:root[data-palette='quadra'] .hero-court { display: block; color: color-mix(in oklab, var(--color-gray-50) 7%, transparent); }
+:root[data-palette='quadra'].light .hero-court { color: color-mix(in oklab, var(--color-gray-50) 5%, transparent); }
+
 @layer base {
   body { @apply bg-gray-950 text-gray-100 antialiased min-h-screen; }
   :focus-visible { @apply outline-2 outline-offset-2 outline-blue-400; }
