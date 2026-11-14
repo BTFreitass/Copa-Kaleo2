@@ -55,7 +55,7 @@ Antes de começar uma tarefa, escreva aqui e faça push, para o outro saber. Ao 
 
 | Pessoa | Tarefa (ID do backlog) | Branch | Desde |
 |---|---|---|---|
-| — | — | — | — |
+| Bruno (Claude) | Esquema de cores "Quadra noturna" + escolha do esquema no painel (Personalização) | `feat/paleta-personalizavel` | 2026-11-14 |
 
 ## Pull Requests abertos
 
